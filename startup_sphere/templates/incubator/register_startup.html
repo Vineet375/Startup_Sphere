@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Register Your Startup | StartupSphere{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card p-4">
+            <div class="text-center mb-4">
+                <h3 class="fw-bold text-primary">Register Your Startup</h3>
+                <p class="text-muted">Enter the details of your startup to join the ecosystem.</p>
+            </div>
+            
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label fw-medium">Startup Name</label>
+                        {{ form.name }}
+                        {% for error in form.name.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.tagline.id_for_label }}" class="form-label fw-medium">Tagline</label>
+                        {{ form.tagline }}
+                        {% for error in form.tagline.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.problem_statement.id_for_label }}" class="form-label fw-medium">Problem Statement</label>
+                    {{ form.problem_statement }}
+                    {% for error in form.problem_statement.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="{{ form.proposed_solution.id_for_label }}" class="form-label fw-medium">Proposed Solution</label>
+                    {{ form.proposed_solution }}
+                    {% for error in form.proposed_solution.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.stage.id_for_label }}" class="form-label fw-medium">Startup Stage</label>
+                        {{ form.stage }}
+                        {% for error in form.stage.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="{{ form.category.id_for_label }}" class="form-label fw-medium">Category</label>
+                        {{ form.category }}
+                        {% for error in form.category.errors %}
+                            <div class="text-danger small mt-1">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="{{ form.logo.id_for_label }}" class="form-label fw-medium">Logo (Optional)</label>
+                    {{ form.logo }}
+                    {% for error in form.logo.errors %}
+                        <div class="text-danger small mt-1">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                
+                <div class="d-flex justify-content-end gap-2">
+                    <a href="{% url 'dashboard:home' %}" class="btn btn-light fw-medium">Cancel</a>
+                    <button type="submit" class="btn btn-primary fw-bold">Register Startup</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | StartupSphere{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar Skeleton -->
+    <div class="col-md-3 mb-4">
+        <div class="card p-3 h-100">
+            <h6 class="text-muted fw-bold text-uppercase mb-3 px-2">Menu</h6>
+            <div class="nav flex-column nav-pills">
+                <a class="nav-link active fw-medium mb-2" href="#">Dashboard</a>
+                
+                {% if role == 'founder' %}
+                    <a class="nav-link text-dark fw-medium mb-2" href="#">My Startup</a>
+                    <a class="nav-link text-dark fw-medium mb-2" href="#">Milestones</a>
+                {% elif role == 'mentor' %}
+                    <a class="nav-link text-dark fw-medium mb-2" href="#">Assigned Startups</a>
+                {% elif role == 'investor' %}
+                    <a class="nav-link text-dark fw-medium mb-2" href="#">Portfolio</a>
+                    <a class="nav-link text-dark fw-medium mb-2" href="#">Deal Flow</a>
+                {% elif role == 'applicant' %}
+                    <a class="nav-link text-dark fw-medium mb-2" href="#">My Applications</a>
+                {% endif %}
+                
+                <a class="nav-link text-dark fw-medium mb-2" href="#">Messages</a>
+                <a class="nav-link text-dark fw-medium" href="#">Settings</a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="col-md-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold m-0">Welcome back, {{ user.first_name|default:user.username }} 👋</h4>
+            <span class="badge bg-primary text-capitalize fs-6">{{ role }}</span>
+        </div>
+        
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="card p-4 text-center">
+                    <h2 class="fw-bold text-primary mb-1">0</h2>
+                    <p class="text-muted mb-0 small">Active Items</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-4 text-center">
+                    <h2 class="fw-bold text-success mb-1">0</h2>
+                    <p class="text-muted mb-0 small">Completed</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card p-4 text-center">
+                    <h2 class="fw-bold text-warning mb-1">0</h2>
+                    <p class="text-muted mb-0 small">Pending Actions</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card p-4">
+            <h6 class="fw-bold mb-3">Recent Activity</h6>
+            <div class="text-muted small">No recent activity to show.</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

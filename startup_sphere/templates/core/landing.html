@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}StartupSphere | Connect, Build, Grow{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+        color: white;
+        border-radius: 20px;
+        padding: 80px 40px;
+        text-align: center;
+        margin-bottom: 40px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    .hero-title {
+        font-weight: 700;
+        font-size: 3.5rem;
+        margin-bottom: 20px;
+    }
+    .hero-title span {
+        background: linear-gradient(to right, #6366f1, #06b6d4);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .hero-subtitle {
+        font-size: 1.2rem;
+        color: #94a3b8;
+        max-width: 600px;
+        margin: 0 auto 40px;
+    }
+    .feature-card {
+        padding: 30px;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    .feature-card:hover {
+        transform: translateY(-5px);
+    }
+    .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        color: var(--primary);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">One <span>Connected Ecosystem</span></h1>
+    <p class="hero-subtitle">Empowering Ideas. Building Startups. Creating Impact. Join a thriving ecosystem of founders, mentors, investors, and talent.</p>
+    <div class="d-flex justify-content-center gap-3">
+        <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-4">Get Started</a>
+        <a href="#" class="btn btn-outline-light btn-lg px-4">Explore Startups</a>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <div class="col-md-3">
+        <div class="card feature-card h-100">
+            <div class="feature-icon">🚀</div>
+            <h5 class="fw-bold">Founders</h5>
+            <p class="text-muted small mb-0">Launch your idea, track milestones, and build your dream team.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card feature-card h-100">
+            <div class="feature-icon">💡</div>
+            <h5 class="fw-bold">Mentors</h5>
+            <p class="text-muted small mb-0">Guide the next generation of startups and share your expertise.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card feature-card h-100">
+            <div class="feature-icon">💰</div>
+            <h5 class="fw-bold">Investors</h5>
+            <p class="text-muted small mb-0">Discover high-potential startups and manage your portfolio.</p>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card feature-card h-100">
+            <div class="feature-icon">🤝</div>
+            <h5 class="fw-bold">Talent</h5>
+            <p class="text-muted small mb-0">Find exciting opportunities and join growing startups.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
