@@ -2,65 +2,227 @@
 
 {% block title %}Dashboard | StartupSphere{% endblock %}
 
-{% block content %}
-<div class="row">
-    <!-- Sidebar Skeleton -->
-    <div class="col-md-3 mb-4">
-        <div class="card p-3 h-100">
-            <h6 class="text-muted fw-bold text-uppercase mb-3 px-2">Menu</h6>
-            <div class="nav flex-column nav-pills">
-                <a class="nav-link active fw-medium mb-2" href="#">Dashboard</a>
-                
-                {% if role == 'founder' %}
-                    <a class="nav-link text-dark fw-medium mb-2" href="#">My Startup</a>
-                    <a class="nav-link text-dark fw-medium mb-2" href="#">Milestones</a>
-                {% elif role == 'mentor' %}
-                    <a class="nav-link text-dark fw-medium mb-2" href="#">Assigned Startups</a>
-                {% elif role == 'investor' %}
-                    <a class="nav-link text-dark fw-medium mb-2" href="#">Portfolio</a>
-                    <a class="nav-link text-dark fw-medium mb-2" href="#">Deal Flow</a>
-                {% elif role == 'applicant' %}
-                    <a class="nav-link text-dark fw-medium mb-2" href="#">My Applications</a>
-                {% endif %}
-                
-                <a class="nav-link text-dark fw-medium mb-2" href="#">Messages</a>
-                <a class="nav-link text-dark fw-medium" href="#">Settings</a>
-            </div>
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    <!-- Sidebar -->
+    <div class="sidebar d-none d-lg-block px-3" style="width: 250px; flex-shrink: 0;">
+        <div class="nav flex-column mb-auto">
+            <a href="#" class="nav-link active">
+                <i class="bi bi-house-door"></i>
+                Dashboard
+            </a>
+            
+            <a href="#" class="nav-link">
+                <i class="bi bi-rocket"></i>
+                My Startup
+            </a>
+            
+            <a href="#" class="nav-link">
+                <i class="bi bi-lightbulb"></i>
+                Incubator
+            </a>
+            
+            <a href="#" class="nav-link">
+                <i class="bi bi-currency-dollar"></i>
+                Funding (CRM)
+            </a>
+            
+            <a href="#" class="nav-link">
+                <i class="bi bi-person-badge"></i>
+                Hiring
+            </a>
+            
+            <a href="#" class="nav-link">
+                <i class="bi bi-briefcase"></i>
+                Investors
+            </a>
+            
+            <a href="#" class="nav-link">
+                <i class="bi bi-file-earmark-text"></i>
+                Applications
+            </a>
+            
+            <a href="#" class="nav-link">
+                <i class="bi bi-calendar-event"></i>
+                Events
+            </a>
+            
+            <a href="#" class="nav-link">
+                <i class="bi bi-chat-left-dots"></i>
+                Messages
+            </a>
+            
+            <a href="#" class="nav-link">
+                <i class="bi bi-folder2-open"></i>
+                Documents
+            </a>
+            
+            <a href="#" class="nav-link">
+                <i class="bi bi-graph-up"></i>
+                Analytics
+            </a>
+            
+            <a href="#" class="nav-link mt-2">
+                <i class="bi bi-gear"></i>
+                Settings
+            </a>
         </div>
     </div>
-    
-    <!-- Main Content -->
-    <div class="col-md-9">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="fw-bold m-0">Welcome back, {{ user.first_name|default:user.username }} 👋</h4>
-            <span class="badge bg-primary text-capitalize fs-6">{{ role }}</span>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow-1 p-4" style="overflow-y: auto;">
+        <!-- Header -->
+        <div class="mb-4">
+            <h4 class="fw-bold mb-1">Welcome back, {{ user.first_name|default:user.username }} 👋</h4>
+            <p class="text-muted small">Here's what's happening with your startup today.</p>
         </div>
-        
+
+        <!-- 4 KPI Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6 col-lg-3">
+                <div class="card p-3 h-100 d-flex flex-column justify-content-center">
+                    <div class="d-flex align-items-center mb-2 text-primary">
+                        <i class="bi bi-lightbulb fs-5 me-2"></i>
+                        <span class="small fw-medium">Ideas Submitted</span>
+                    </div>
+                    <h2 class="fw-bold mb-0">12</h2>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card p-3 h-100 d-flex flex-column justify-content-center">
+                    <div class="d-flex align-items-center mb-2 text-success">
+                        <i class="bi bi-flag fs-5 me-2"></i>
+                        <span class="small fw-medium">Milestones Completed</span>
+                    </div>
+                    <h2 class="fw-bold mb-0">7</h2>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card p-3 h-100 d-flex flex-column justify-content-center">
+                    <div class="d-flex align-items-center mb-2 text-info">
+                        <i class="bi bi-currency-rupee fs-5 me-2"></i>
+                        <span class="small fw-medium">Funding Raised</span>
+                    </div>
+                    <h2 class="fw-bold mb-0">12.5L</h2>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card p-3 h-100 d-flex flex-column justify-content-center">
+                    <div class="d-flex align-items-center mb-2 text-warning">
+                        <i class="bi bi-people fs-5 me-2"></i>
+                        <span class="small fw-medium">Team Members</span>
+                    </div>
+                    <h2 class="fw-bold mb-0">16</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Middle Row: Progress and Events -->
         <div class="row g-4 mb-4">
-            <div class="col-md-4">
-                <div class="card p-4 text-center">
-                    <h2 class="fw-bold text-primary mb-1">0</h2>
-                    <p class="text-muted mb-0 small">Active Items</p>
+            <div class="col-md-7">
+                <div class="card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-end mb-3">
+                        <h6 class="fw-bold m-0">Startup Progress</h6>
+                        <span class="text-muted small">72%</span>
+                    </div>
+                    <div class="progress mb-3" style="height: 8px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 72%" aria-valuenow="72" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="text-muted small mb-1">Next Milestone</p>
+                    <p class="fw-medium m-0">MVP Development</p>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card p-4 text-center">
-                    <h2 class="fw-bold text-success mb-1">0</h2>
-                    <p class="text-muted mb-0 small">Completed</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card p-4 text-center">
-                    <h2 class="fw-bold text-warning mb-1">0</h2>
-                    <p class="text-muted mb-0 small">Pending Actions</p>
+            <div class="col-md-5">
+                <div class="card p-4 h-100">
+                    <h6 class="fw-bold mb-3">Upcoming Event</h6>
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded p-2">
+                            <i class="bi bi-calendar-event fs-4"></i>
+                        </div>
+                        <div>
+                            <p class="fw-bold mb-0 small">Pitch Day</p>
+                            <p class="text-muted small mb-1">with Investors</p>
+                            <p class="text-muted small" style="font-size: 0.75rem;">24 May, 2025 - 11:00 AM</p>
+                            <a href="#" class="text-primary small text-decoration-none fw-medium">View Details <i class="bi bi-arrow-right"></i></a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="card p-4">
-            <h6 class="fw-bold mb-3">Recent Activity</h6>
-            <div class="text-muted small">No recent activity to show.</div>
+
+        <!-- Bottom Row: Recent Activities and Quick Actions -->
+        <div class="row g-4">
+            <div class="col-md-7">
+                <div class="card p-4 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold m-0">Recent Activities</h6>
+                        <a href="#" class="text-primary small text-decoration-none fw-medium">View All Activities <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                    
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="text-primary me-3 mt-1"><i class="bi bi-person-circle fs-5"></i></div>
+                        <div>
+                            <p class="mb-0 small fw-medium">Mentor feedback received on your pitch deck.</p>
+                            <p class="text-muted" style="font-size: 0.7rem;">2h ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="text-info me-3 mt-1"><i class="bi bi-arrow-up-circle fs-5"></i></div>
+                        <div>
+                            <p class="mb-0 small fw-medium">Raised ₹5L in Pre-Seed round.</p>
+                            <p class="text-muted" style="font-size: 0.7rem;">1d ago</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="text-success me-3 mt-1"><i class="bi bi-person-plus fs-5"></i></div>
+                        <div>
+                            <p class="mb-0 small fw-medium">New team member joined your startup.</p>
+                            <p class="text-muted" style="font-size: 0.7rem;">2d ago</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-5">
+                <div class="card p-4 h-100">
+                    <h6 class="fw-bold mb-4">Quick Actions</h6>
+                    
+                    <a href="{% url 'incubator:register_startup' %}" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-main border rounded p-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-currency-dollar text-success"></i>
+                            <span class="small fw-medium">Submit Idea</span>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted"></i>
+                    </a>
+                    
+                    <a href="#" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-main border rounded p-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-file-earmark-pdf text-primary"></i>
+                            <span class="small fw-medium">Upload Pitch Deck</span>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted"></i>
+                    </a>
+                    
+                    <a href="#" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-main border rounded p-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-currency-dollar text-success"></i>
+                            <span class="small fw-medium">Apply for Funding</span>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted"></i>
+                    </a>
+                    
+                    <a href="#" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-main border rounded p-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-briefcase text-warning"></i>
+                            <span class="small fw-medium">Post a Job</span>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted"></i>
+                    </a>
+                </div>
+            </div>
         </div>
-    </div>
+    </main>
 </div>
-{% endblock %}
+{% endblock layout %}
