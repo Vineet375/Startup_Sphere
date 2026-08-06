@@ -2,6 +2,7 @@
   <img src="startup_sphere/static/images/logo.png" alt="StartupSphere Logo" width="150"/>
   <h1>StartupSphere</h1>
   <p><b>One Connected Ecosystem for Ideas, Founders, Funding & Talent.</b></p>
+  <p><a href="https://startupsphere-96dk.onrender.com/">🟢 <b>Live on Render: startupsphere-96dk.onrender.com</b></a></p>
 </div>
 
 ---
@@ -55,7 +56,9 @@ Follow these steps to run StartupSphere on your local machine.
 
 3. **Install Dependencies**
    ```bash
-   pip install django pillow
+   # Note: The requirements.txt file is located inside the startup_sphere directory
+   cd startup_sphere
+   pip install -r requirements.txt
    ```
 
 4. **Apply Database Migrations**
