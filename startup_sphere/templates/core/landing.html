@@ -1,22 +1,24 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}StartupSphere | Connect, Build, Grow{% endblock %}
+{% block title %}StartupSphere | The Ultimate Startup Ecosystem{% endblock %}
 
 {% block extra_css %}
 <style>
     .hero-section {
         background: var(--bg-surface);
         border: 1px solid var(--border-color);
-        border-radius: 20px;
-        padding: 100px 40px;
+        border-radius: 24px;
+        padding: 120px 40px;
         text-align: center;
-        margin-bottom: 40px;
+        margin-top: 20px;
+        margin-bottom: 60px;
         box-shadow: var(--card-shadow);
         position: relative;
         overflow: hidden;
     }
     
-    /* Subtle background glow effect */
+    /* Dynamic background glow effect */
     .hero-section::before {
         content: '';
         position: absolute;
@@ -24,7 +26,7 @@
         left: -50%;
         width: 200%;
         height: 200%;
-        background: radial-gradient(circle at center, rgba(99, 102, 241, 0.05) 0%, transparent 50%);
+        background: radial-gradient(circle at center, rgba(99, 102, 241, 0.08) 0%, transparent 40%);
         z-index: 0;
         pointer-events: none;
     }
@@ -36,41 +38,79 @@
 
     .hero-title {
         font-weight: 800;
-        font-size: 3.5rem;
+        font-size: 4rem;
         margin-bottom: 24px;
         color: var(--text-main);
+        line-height: 1.1;
     }
+    
     .hero-title span {
         background: linear-gradient(135deg, #6366f1, #0ea5e9);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     }
+    
     .hero-subtitle {
         font-size: 1.25rem;
         color: var(--text-muted);
-        max-width: 650px;
+        max-width: 700px;
         margin: 0 auto 40px;
-        line-height: 1.6;
+        line-height: 1.7;
     }
+    
     .feature-card {
-        padding: 35px 25px;
+        padding: 40px 30px;
         text-align: center;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition: all 0.3s ease;
         border: 1px solid var(--border-color);
+        border-radius: 16px;
+        background-color: var(--bg-surface);
+        position: relative;
+        overflow: hidden;
     }
+    
+    .feature-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, transparent, transparent);
+        transition: background 0.3s ease;
+    }
+
     .feature-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-        border-color: var(--primary-color);
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
+        border-color: var(--border-color);
     }
-    .feature-icon {
-        font-size: 2.5rem;
-        margin-bottom: 20px;
-        color: var(--primary-color);
+    
+    .feature-card:hover::before {
+        background: linear-gradient(90deg, #6366f1, #0ea5e9);
     }
     
     [data-bs-theme="dark"] .feature-card:hover {
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.4);
+    }
+
+    .feature-icon {
+        font-size: 2.8rem;
+        margin-bottom: 20px;
+        color: var(--primary-color);
+        display: inline-block;
+        padding: 15px;
+        border-radius: 50%;
+        background-color: rgba(99, 102, 241, 0.05);
+    }
+    
+    .stats-section {
+        background-color: var(--primary-color);
+        border-radius: 24px;
+        padding: 60px 0;
+        color: white;
+        margin-bottom: 60px;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     }
 </style>
 {% endblock %}
@@ -78,42 +118,49 @@
 {% block content %}
 <div class="hero-section">
     <div class="hero-content">
+        <div class="mb-4 d-inline-block px-4 py-2 rounded-pill border border-primary bg-primary bg-opacity-10 text-primary fw-medium small">
+            🚀 The Operating System for Startups
+        </div>
         <h1 class="hero-title">One <span>Connected Ecosystem</span></h1>
-        <p class="hero-subtitle">Empowering Ideas. Building Startups. Creating Impact.<br>Join a thriving ecosystem of founders, mentors, investors, and talent.</p>
+        <p class="hero-subtitle">Empowering Ideas. Building Startups. Creating Impact.<br>Join a thriving ecosystem designed to connect founders, mentors, investors, and top talent on a single unified platform.</p>
         <div class="d-flex justify-content-center gap-3">
-            <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm">Get Started</a>
-            <a href="#" class="btn btn-outline-secondary text-main border-secondary btn-lg px-5 py-3 rounded-pill fw-bold bg-transparent">Explore Startups</a>
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-5 py-3 rounded-pill fw-bold shadow-sm d-flex align-items-center gap-2">
+                Get Started <i class="bi bi-arrow-right"></i>
+            </a>
+            <a href="#" class="btn btn-outline-secondary text-main border-secondary btn-lg px-5 py-3 rounded-pill fw-bold bg-transparent">
+                Explore Platform
+            </a>
         </div>
     </div>
 </div>
 
 <div class="row g-4 mb-5">
-    <div class="col-md-3">
-        <div class="card feature-card h-100 bg-surface">
+    <div class="col-md-6 col-lg-3">
+        <div class="card feature-card h-100">
             <div class="feature-icon"><i class="bi bi-rocket-takeoff"></i></div>
-            <h5 class="fw-bold text-main">Founders</h5>
-            <p class="text-muted small mb-0">Launch your idea, track milestones, and build your dream team.</p>
+            <h5 class="fw-bold text-main">For Founders</h5>
+            <p class="text-muted small mb-0">Launch your idea, track critical milestones, manage equity, and build your dream team seamlessly.</p>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card feature-card h-100 bg-surface">
+    <div class="col-md-6 col-lg-3">
+        <div class="card feature-card h-100">
             <div class="feature-icon"><i class="bi bi-lightbulb"></i></div>
-            <h5 class="fw-bold text-main">Mentors</h5>
-            <p class="text-muted small mb-0">Guide the next generation of startups and share your expertise.</p>
+            <h5 class="fw-bold text-main">For Mentors</h5>
+            <p class="text-muted small mb-0">Guide the next generation of disruptive startups and share your domain expertise.</p>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card feature-card h-100 bg-surface">
+    <div class="col-md-6 col-lg-3">
+        <div class="card feature-card h-100">
             <div class="feature-icon"><i class="bi bi-briefcase"></i></div>
-            <h5 class="fw-bold text-main">Investors</h5>
-            <p class="text-muted small mb-0">Discover high-potential startups and manage your portfolio.</p>
+            <h5 class="fw-bold text-main">For Investors</h5>
+            <p class="text-muted small mb-0">Discover high-potential startups, review pitch decks securely, and manage your portfolio.</p>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card feature-card h-100 bg-surface">
+    <div class="col-md-6 col-lg-3">
+        <div class="card feature-card h-100">
             <div class="feature-icon"><i class="bi bi-people"></i></div>
-            <h5 class="fw-bold text-main">Talent</h5>
-            <p class="text-muted small mb-0">Find exciting opportunities and join growing startups.</p>
+            <h5 class="fw-bold text-main">For Talent</h5>
+            <p class="text-muted small mb-0">Find exciting career opportunities and join fast-growing startups at the ground level.</p>
         </div>
     </div>
 </div>
