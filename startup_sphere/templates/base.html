@@ -161,10 +161,52 @@
             color: var(--text-main);
         }
 
+        /* Loading Overlay */
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-body);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loader-logo {
+            width: 80px;
+            height: 80px;
+            animation: pulse-glow 1.5s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% {
+                transform: scale(0.9);
+                filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.4));
+            }
+            100% {
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 25px rgba(14, 165, 233, 0.8));
+            }
+        }
+
+        body.loaded #loader-overlay {
+            opacity: 0;
+            visibility: hidden;
+        }
+
         {% block extra_css %}{% endblock %}
     </style>
 </head>
 <body>
+
+    <!-- Loading Animation -->
+    <div id="loader-overlay">
+        <img src="{% static 'images/logo.png' %}" alt="Loading..." class="loader-logo">
+    </div>
 
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container{% if request.resolver_match.app_name == 'dashboard' %}-fluid px-4{% endif %}">
@@ -256,6 +298,11 @@
     
     <!-- Theme Toggle Logic -->
     <script>
+        // Loader logic
+        window.addEventListener('load', function() {
+            document.body.classList.add('loaded');
+        });
+
         const getStoredTheme = () => localStorage.getItem('theme');
         const setStoredTheme = theme => localStorage.setItem('theme', theme);
         const getPreferredTheme = () => {
