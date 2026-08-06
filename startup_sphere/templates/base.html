@@ -18,21 +18,21 @@
     <link rel="icon" href="{% static 'images/logo.png' %}" type="image/png">
     
     <style>
-        :root, [data-bs-theme="light"] {
-            --primary-color: #6366f1;
-            --primary-hover: #4f46e5;
-            --bg-body: #f1f5f9;
-            --bg-surface: #ffffff;
-            --bg-sidebar: #ffffff;
+        :root[data-bs-theme="light"] {
+            --bg-body: #f8fafc;
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
+            --overlay-bg: rgba(255, 255, 255, 0.6);
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-surface: #ffffff;
+            --bg-sidebar: #ffffff;
             --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
             --success-color: #10b981;
             --warning-color: #f59e0b;
         }
-
-        [data-bs-theme="dark"] {
+        :root[data-bs-theme="dark"] {
             --primary-color: #6366f1; /* Or #818cf8 for dark mode contrast */
             --primary-hover: #4f46e5;
             --bg-body: #0f172a;       /* Darkest background */
@@ -42,6 +42,7 @@
             --text-muted: #94a3b8;
             --border-color: #334155;
             --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+            --overlay-bg: rgba(15, 23, 42, 0.6);
         }
 
         body {
@@ -168,7 +169,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: var(--bg-body);
+            background-color: var(--overlay-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             z-index: 9999;
             display: flex;
             justify-content: center;
@@ -203,10 +206,12 @@
 </head>
 <body>
 
-    <!-- Loading Animation -->
+    <!-- Loading Animation (Only on specific pages) -->
+    {% if request.resolver_match.url_name == 'landing' or request.resolver_match.url_name == 'home' %}
     <div id="loader-overlay">
         <img src="{% static 'images/logo.png' %}" alt="Loading..." class="loader-logo">
     </div>
+    {% endif %}
 
     <nav class="navbar navbar-expand-lg sticky-top">
         <div class="container{% if request.resolver_match.app_name == 'dashboard' %}-fluid px-4{% endif %}">
