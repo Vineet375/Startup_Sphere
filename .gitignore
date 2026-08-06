@@ -20,3 +20,9 @@ env/
 .idea/
 .vscode/
 *.swp
+
+# Environment variables
+.env
+
+# Collectstatic output
+staticfiles/
