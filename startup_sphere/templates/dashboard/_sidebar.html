@@ -11,47 +11,47 @@
             My Startup
         </a>
         
-        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' %}active{% endif %}">
+        <a href="{% url 'dashboard:coming_soon' feature='incubator' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'incubator' %}active{% endif %}">
             <i class="bi bi-lightbulb"></i>
             Incubator
         </a>
         
-        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+        <a href="{% url 'dashboard:coming_soon' feature='funding' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'funding' %}active{% endif %}">
             <i class="bi bi-currency-dollar"></i>
             Funding (CRM)
         </a>
         
-        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+        <a href="{% url 'dashboard:coming_soon' feature='hiring' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'hiring' %}active{% endif %}">
             <i class="bi bi-person-badge"></i>
             Hiring
         </a>
         
-        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+        <a href="{% url 'dashboard:coming_soon' feature='investors' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'investors' %}active{% endif %}">
             <i class="bi bi-briefcase"></i>
             Investors
         </a>
         
-        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+        <a href="{% url 'dashboard:coming_soon' feature='applications' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'applications' %}active{% endif %}">
             <i class="bi bi-file-earmark-text"></i>
             Applications
         </a>
         
-        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+        <a href="{% url 'dashboard:coming_soon' feature='events' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'events' %}active{% endif %}">
             <i class="bi bi-calendar-event"></i>
             Events
         </a>
         
-        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+        <a href="{% url 'dashboard:coming_soon' feature='messages' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'messages' %}active{% endif %}">
             <i class="bi bi-chat-left-dots"></i>
             Messages
         </a>
         
-        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+        <a href="{% url 'dashboard:coming_soon' feature='documents' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'documents' %}active{% endif %}">
             <i class="bi bi-folder2-open"></i>
             Documents
         </a>
         
-        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+        <a href="{% url 'dashboard:coming_soon' feature='analytics' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'analytics' %}active{% endif %}">
             <i class="bi bi-graph-up"></i>
             Analytics
         </a>

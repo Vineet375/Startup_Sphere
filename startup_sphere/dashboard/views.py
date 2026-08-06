@@ -21,5 +21,6 @@ def profile_view(request):
     return render(request, 'dashboard/profile.html', {'form': form})
 
 @login_required
-def coming_soon_view(request):
-    return render(request, 'dashboard/coming_soon.html')
+def coming_soon_view(request, feature='feature'):
+    feature_name = feature.replace('-', ' ').title()
+    return render(request, 'dashboard/coming_soon.html', {'feature_name': feature_name, 'feature_slug': feature})
