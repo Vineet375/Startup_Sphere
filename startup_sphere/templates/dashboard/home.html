@@ -5,69 +5,7 @@
 {% block layout %}
 <div class="d-flex" style="min-height: calc(100vh - 65px);">
     <!-- Sidebar -->
-    <div class="sidebar d-none d-lg-block px-3" style="width: 250px; flex-shrink: 0;">
-        <div class="nav flex-column mb-auto">
-            <a href="#" class="nav-link active">
-                <i class="bi bi-house-door"></i>
-                Dashboard
-            </a>
-            
-            <a href="#" class="nav-link">
-                <i class="bi bi-rocket"></i>
-                My Startup
-            </a>
-            
-            <a href="#" class="nav-link">
-                <i class="bi bi-lightbulb"></i>
-                Incubator
-            </a>
-            
-            <a href="#" class="nav-link">
-                <i class="bi bi-currency-dollar"></i>
-                Funding (CRM)
-            </a>
-            
-            <a href="#" class="nav-link">
-                <i class="bi bi-person-badge"></i>
-                Hiring
-            </a>
-            
-            <a href="#" class="nav-link">
-                <i class="bi bi-briefcase"></i>
-                Investors
-            </a>
-            
-            <a href="#" class="nav-link">
-                <i class="bi bi-file-earmark-text"></i>
-                Applications
-            </a>
-            
-            <a href="#" class="nav-link">
-                <i class="bi bi-calendar-event"></i>
-                Events
-            </a>
-            
-            <a href="#" class="nav-link">
-                <i class="bi bi-chat-left-dots"></i>
-                Messages
-            </a>
-            
-            <a href="#" class="nav-link">
-                <i class="bi bi-folder2-open"></i>
-                Documents
-            </a>
-            
-            <a href="#" class="nav-link">
-                <i class="bi bi-graph-up"></i>
-                Analytics
-            </a>
-            
-            <a href="#" class="nav-link mt-2">
-                <i class="bi bi-gear"></i>
-                Settings
-            </a>
-        </div>
-    </div>
+    {% include 'dashboard/_sidebar.html' %}
 
     <!-- Main Content Area -->
     <main class="flex-grow-1 p-4" style="overflow-y: auto;">

@@ -20,8 +20,16 @@
                 </div>
                 
                 <div class="mb-3">
-                    <label for="id_password" class="form-label fw-medium">Password</label>
-                    <input type="password" name="password" class="form-control" id="id_password" required>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <label for="id_password" class="form-label fw-medium mb-0">Password</label>
+                        <a href="#" class="text-primary small text-decoration-none fw-medium">Forgot Password?</a>
+                    </div>
+                    <div class="input-group mt-2">
+                        <input type="password" name="password" class="form-control border-end-0" id="id_password" required>
+                        <span class="input-group-text bg-body border-start-0 text-muted" style="cursor: pointer;" onclick="togglePassword('id_password', this)">
+                            <i class="bi bi-eye-slash"></i>
+                        </span>
+                    </div>
                 </div>
                 
                 {% if form.errors %}
@@ -39,4 +47,20 @@
         </div>
     </div>
 </div>
+
+<script>
+    function togglePassword(inputId, iconSpan) {
+        const input = document.getElementById(inputId);
+        const icon = iconSpan.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('bi-eye-slash');
+            icon.classList.add('bi-eye');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('bi-eye');
+            icon.classList.add('bi-eye-slash');
+        }
+    }
+</script>
 {% endblock %}

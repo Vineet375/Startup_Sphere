@@ -1,0 +1,64 @@
+{% load static %}
+<div class="sidebar d-none d-lg-block px-3" style="width: 250px; flex-shrink: 0;">
+    <div class="nav flex-column mb-auto">
+        <a href="{% url 'dashboard:home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+            <i class="bi bi-house-door"></i>
+            Dashboard
+        </a>
+        
+        <a href="{% url 'incubator:register_startup' %}" class="nav-link">
+            <i class="bi bi-rocket"></i>
+            My Startup
+        </a>
+        
+        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' %}active{% endif %}">
+            <i class="bi bi-lightbulb"></i>
+            Incubator
+        </a>
+        
+        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+            <i class="bi bi-currency-dollar"></i>
+            Funding (CRM)
+        </a>
+        
+        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+            <i class="bi bi-person-badge"></i>
+            Hiring
+        </a>
+        
+        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+            <i class="bi bi-briefcase"></i>
+            Investors
+        </a>
+        
+        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+            <i class="bi bi-file-earmark-text"></i>
+            Applications
+        </a>
+        
+        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+            <i class="bi bi-calendar-event"></i>
+            Events
+        </a>
+        
+        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+            <i class="bi bi-chat-left-dots"></i>
+            Messages
+        </a>
+        
+        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+            <i class="bi bi-folder2-open"></i>
+            Documents
+        </a>
+        
+        <a href="{% url 'dashboard:coming_soon' %}" class="nav-link">
+            <i class="bi bi-graph-up"></i>
+            Analytics
+        </a>
+        
+        <a href="{% url 'dashboard:profile' %}" class="nav-link mt-2 {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+            <i class="bi bi-gear"></i>
+            Settings
+        </a>
+    </div>
+</div>

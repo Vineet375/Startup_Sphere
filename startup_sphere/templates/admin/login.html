@@ -1,0 +1,57 @@
+{% extends "admin/login.html" %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <style>
+        .password-container {
+            position: relative;
+        }
+        .password-container input[type="password"], .password-container input[type="text"] {
+            padding-right: 30px;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: #666;
+            user-select: none;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {{ block.super }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const passwordRow = document.querySelector('.field-password');
+            if (passwordRow) {
+                const passwordInput = document.getElementById('id_password');
+                const container = document.createElement('div');
+                container.className = 'password-container';
+                
+                // Wrap the input
+                passwordInput.parentNode.insertBefore(container, passwordInput);
+                container.appendChild(passwordInput);
+                
+                // Add the toggle button
+                const toggleBtn = document.createElement('span');
+                toggleBtn.className = 'toggle-password';
+                toggleBtn.innerHTML = '👁️';
+                container.appendChild(toggleBtn);
+                
+                toggleBtn.addEventListener('click', function() {
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        toggleBtn.style.opacity = '0.5';
+                    } else {
+                        passwordInput.type = 'password';
+                        toggleBtn.style.opacity = '1';
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

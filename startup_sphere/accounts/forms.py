@@ -21,3 +21,13 @@ class CustomUserCreationForm(UserCreationForm):
         for field_name, field in self.fields.items():
             if field_name != 'role':
                 field.widget.attrs.update({'class': 'form-control'})
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})

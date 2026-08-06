@@ -36,4 +36,43 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const passwordInputs = document.querySelectorAll('input[type="password"]');
+        passwordInputs.forEach(input => {
+            // Create wrapper
+            const wrapper = document.createElement('div');
+            wrapper.className = 'input-group';
+            
+            // Insert wrapper before input
+            input.parentNode.insertBefore(wrapper, input);
+            
+            // Move input into wrapper
+            wrapper.appendChild(input);
+            input.classList.add('border-end-0');
+            
+            // Create toggle button
+            const toggleBtn = document.createElement('span');
+            toggleBtn.className = 'input-group-text bg-body border-start-0 text-muted';
+            toggleBtn.style.cursor = 'pointer';
+            toggleBtn.innerHTML = '<i class="bi bi-eye-slash"></i>';
+            
+            toggleBtn.addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('bi-eye-slash');
+                    icon.classList.add('bi-eye');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('bi-eye');
+                    icon.classList.add('bi-eye-slash');
+                }
+            });
+            
+            wrapper.appendChild(toggleBtn);
+        });
+    });
+</script>
 {% endblock %}
