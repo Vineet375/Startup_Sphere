@@ -32,3 +32,24 @@ class Startup(models.Model):
 
     def __str__(self):
         return self.name
+
+class Idea(models.Model):
+    STATUS_CHOICES = (
+        ('draft', 'Draft'),
+        ('published', 'Published'),
+        ('evaluating', 'Under Evaluation'),
+        ('accepted', 'Accepted for Incubation'),
+        ('rejected', 'Rejected'),
+    )
+
+    creator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='ideas')
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    industry = models.CharField(max_length=50, blank=True, null=True)
+    target_audience = models.CharField(max_length=200, blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title

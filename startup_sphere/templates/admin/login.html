@@ -26,9 +26,8 @@
     {{ block.super }}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            const passwordRow = document.querySelector('.field-password');
-            if (passwordRow) {
-                const passwordInput = document.getElementById('id_password');
+            const passwordInput = document.getElementById('id_password');
+            if (passwordInput) {
                 const container = document.createElement('div');
                 container.className = 'password-container';
                 
