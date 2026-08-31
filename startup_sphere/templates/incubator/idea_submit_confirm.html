@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Idea | StartupSphere{% endblock %}
+
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+
+    <main class="flex-grow-1 p-4 d-flex align-items-center justify-content-center" style="overflow-y: auto;">
+        <div class="card p-5 text-center shadow-sm" style="max-width: 500px;">
+            <div class="mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary rounded-circle mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-send fs-1"></i>
+                </div>
+                <h3 class="fw-bold mb-2">Submit Your Idea?</h3>
+                <p class="text-muted">You are about to submit the idea: <br><strong class="text-main">"{{ idea.title }}"</strong></p>
+                
+                <div class="alert alert-warning text-start mt-3 small">
+                    <i class="bi bi-exclamation-triangle me-2"></i> 
+                    Once submitted, you will not be able to edit this idea while it is under review. Please ensure all details are accurate.
+                </div>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="{% url 'incubator:idea_detail' idea.id %}" class="btn btn-light fw-medium px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">Yes, Submit Idea</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock layout %}

@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}My Startup | StartupSphere{% endblock %}
+
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+
+    <main class="flex-grow-1 p-4" style="overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">My Startup Profile</h4>
+            <div class="d-flex gap-2">
+                <a href="{% url 'incubator:startup_edit' %}" class="btn btn-outline-primary btn-sm fw-medium">
+                    <i class="bi bi-pencil me-1"></i> Edit Profile
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card p-4 h-100 text-center">
+                    {% if startup.logo %}
+                        <img src="{{ startup.logo.url }}" alt="{{ startup.name }} Logo" class="img-thumbnail rounded-circle mx-auto mb-3" style="width: 120px; height: 120px; object-fit: cover;">
+                    {% else %}
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                            <i class="bi bi-rocket fs-1"></i>
+                        </div>
+                    {% endif %}
+                    
+                    <h5 class="fw-bold mb-1">{{ startup.name }}</h5>
+                    <p class="text-muted small mb-3">{{ startup.get_category_display }}</p>
+                    
+                    <div class="d-inline-block px-3 py-1 rounded-pill bg-success bg-opacity-10 text-success fw-medium small mb-3">
+                        {{ startup.get_stage_display }}
+                    </div>
+                    
+                    <hr class="my-3">
+                    
+                    <div class="text-start">
+                        <p class="small text-muted mb-1">Founder</p>
+                        <p class="fw-medium mb-3">{{ startup.founder.get_full_name|default:startup.founder.username }}</p>
+                        
+                        <p class="small text-muted mb-1">Registered On</p>
+                        <p class="fw-medium mb-0">{{ startup.created_at|date:"F j, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-8">
+                <div class="card p-4 mb-4">
+                    <h6 class="fw-bold mb-3">Tagline</h6>
+                    <p class="fs-5 text-muted">{{ startup.tagline|default:"No tagline provided." }}</p>
+                </div>
+                
+                <div class="card p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold m-0">Submitted Ideas & Proposals</h6>
+                        <a href="{% url 'incubator:idea_create' %}" class="btn btn-primary btn-sm fw-medium">
+                            <i class="bi bi-plus me-1"></i> New Idea
+                        </a>
+                    </div>
+                    
+                    {% if startup.ideas.all %}
+                        <div class="list-group list-group-flush">
+                            {% for idea in startup.ideas.all|slice:":3" %}
+                                <a href="{% url 'incubator:idea_detail' idea.id %}" class="list-group-item list-group-item-action px-0 py-3 border-bottom">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1 fw-bold text-main">{{ idea.title }}</h6>
+                                        <small class="text-muted">{{ idea.updated_at|timesince }} ago</small>
+                                    </div>
+                                    <p class="mb-1 text-muted small text-truncate">{{ idea.description }}</p>
+                                    <div class="mt-2">
+                                        {% if idea.status == 'draft' %}
+                                            <span class="badge bg-secondary">Draft</span>
+                                        {% elif idea.status == 'submitted' %}
+                                            <span class="badge bg-primary">Submitted</span>
+                                        {% elif idea.status == 'under_review' %}
+                                            <span class="badge bg-info">Under Review</span>
+                                        {% elif idea.status == 'approved' %}
+                                            <span class="badge bg-success">Approved</span>
+                                        {% elif idea.status == 'rejected' %}
+                                            <span class="badge bg-danger">Rejected</span>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                        {% if startup.ideas.count > 3 %}
+                            <div class="text-center mt-3">
+                                <a href="{% url 'incubator:idea_list' %}" class="text-primary text-decoration-none small fw-medium">View All Ideas <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="text-center py-5">
+                            <div class="text-muted mb-3"><i class="bi bi-folder2-open fs-1"></i></div>
+                            <p class="text-muted">You haven't submitted any ideas yet.</p>
+                            <a href="{% url 'incubator:idea_create' %}" class="btn btn-outline-primary btn-sm">Create Your First Idea</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock layout %}

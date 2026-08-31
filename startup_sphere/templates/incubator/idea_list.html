@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}My Ideas | StartupSphere{% endblock %}
+
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+
+    <main class="flex-grow-1 p-4" style="overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="fw-bold mb-1">My Ideas</h4>
+                <p class="text-muted small">Manage your startup ideas and track their status.</p>
+            </div>
+            <a href="{% url 'incubator:idea_create' %}" class="btn btn-primary fw-medium">
+                <i class="bi bi-plus-lg me-1"></i> New Idea
+            </a>
+        </div>
+
+        <div class="card p-0 overflow-hidden">
+            {% if ideas %}
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Title</th>
+                                <th>Category</th>
+                                <th>Last Updated</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for idea in ideas %}
+                                <tr>
+                                    <td class="ps-4 fw-medium text-main">{{ idea.title }}</td>
+                                    <td class="text-muted small">{{ idea.industry|default:"N/A" }}</td>
+                                    <td class="text-muted small">{{ idea.updated_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if idea.status == 'draft' %}
+                                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary">Draft</span>
+                                        {% elif idea.status == 'submitted' %}
+                                            <span class="badge bg-primary bg-opacity-10 text-primary border border-primary">Submitted</span>
+                                        {% elif idea.status == 'under_review' %}
+                                            <span class="badge bg-info bg-opacity-10 text-info border border-info">Under Review</span>
+                                        {% elif idea.status == 'approved' %}
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success">Approved</span>
+                                        {% elif idea.status == 'rejected' %}
+                                            <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Rejected</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group">
+                                            <a href="{% url 'incubator:idea_detail' idea.id %}" class="btn btn-sm btn-light text-primary" title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            {% if idea.status == 'draft' %}
+                                                <a href="{% url 'incubator:idea_edit' idea.id %}" class="btn btn-sm btn-light text-secondary" title="Edit Draft">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <a href="{% url 'incubator:idea_submit' idea.id %}" class="btn btn-sm btn-light text-success" title="Submit Idea">
+                                                    <i class="bi bi-send"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="text-muted mb-3"><i class="bi bi-lightbulb-off fs-1"></i></div>
+                    <h5 class="fw-bold">No Ideas Yet</h5>
+                    <p class="text-muted mb-4">Start drafting your first big idea to get feedback and support.</p>
+                    <a href="{% url 'incubator:idea_create' %}" class="btn btn-primary fw-medium">Create Idea</a>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock layout %}

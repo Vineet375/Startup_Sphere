@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_edit %}Edit Startup{% else %}Register Startup{% endif %} | StartupSphere{% endblock %}
+
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+
+    <main class="flex-grow-1 p-4" style="overflow-y: auto;">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card p-4">
+                    <div class="mb-4">
+                        <h3 class="fw-bold text-primary">{% if is_edit %}Edit Your Startup{% else %}Register Your Startup{% endif %}</h3>
+                        <p class="text-muted">{% if is_edit %}Update your startup profile information.{% else %}Enter the details of your startup to join the ecosystem.{% endif %}</p>
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.name.id_for_label }}" class="form-label fw-medium">Startup Name</label>
+                                {{ form.name }}
+                                {% for error in form.name.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.tagline.id_for_label }}" class="form-label fw-medium">Tagline</label>
+                                {{ form.tagline }}
+                                {% for error in form.tagline.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.stage.id_for_label }}" class="form-label fw-medium">Startup Stage</label>
+                                {{ form.stage }}
+                                {% for error in form.stage.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.category.id_for_label }}" class="form-label fw-medium">Category</label>
+                                {{ form.category }}
+                                {% for error in form.category.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.logo.id_for_label }}" class="form-label fw-medium">Logo (Optional)</label>
+                            {% if form.instance.logo %}
+                                <div class="mb-2">
+                                    <img src="{{ form.instance.logo.url }}" alt="Current Logo" class="img-thumbnail" style="max-height: 80px;">
+                                </div>
+                            {% endif %}
+                            {{ form.logo }}
+                            {% for error in form.logo.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{% if is_edit %}{% url 'incubator:startup_detail' %}{% else %}{% url 'dashboard:home' %}{% endif %}" class="btn btn-light fw-medium">Cancel</a>
+                            <button type="submit" class="btn btn-primary fw-bold">{% if is_edit %}Save Changes{% else %}Register Startup{% endif %}</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock layout %}

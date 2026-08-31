@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ idea.title }} | StartupSphere{% endblock %}
+
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+
+    <main class="flex-grow-1 p-4" style="overflow-y: auto;">
+        <div class="mb-4">
+            <a href="{% url 'incubator:idea_list' %}" class="text-muted text-decoration-none small fw-medium">
+                <i class="bi bi-arrow-left"></i> Back to Ideas
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <h2 class="fw-bold mb-0 text-main">{{ idea.title }}</h2>
+                        <div>
+                            {% if idea.status == 'draft' %}
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary px-3 py-2">Draft</span>
+                            {% elif idea.status == 'submitted' %}
+                                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary px-3 py-2">Submitted</span>
+                            {% elif idea.status == 'under_review' %}
+                                <span class="badge bg-info bg-opacity-10 text-info border border-info px-3 py-2">Under Review</span>
+                            {% elif idea.status == 'approved' %}
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success px-3 py-2">Approved</span>
+                            {% elif idea.status == 'rejected' %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger px-3 py-2">Rejected</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted fs-5 mb-4">{{ idea.description }}</p>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded h-100">
+                                <p class="small text-muted mb-1 text-uppercase fw-bold">Industry</p>
+                                <p class="mb-0 fw-medium">{{ idea.industry|default:"Not specified" }}</p>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="p-3 bg-light rounded h-100">
+                                <p class="small text-muted mb-1 text-uppercase fw-bold">Target Audience</p>
+                                <p class="mb-0 fw-medium">{{ idea.target_audience|default:"Not specified" }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-3">Problem Statement</h5>
+                    <div class="bg-light p-4 rounded mb-4">
+                        <p class="mb-0">{{ idea.problem_statement|linebreaksbr }}</p>
+                    </div>
+
+                    <h5 class="fw-bold mb-3">Proposed Solution</h5>
+                    <div class="bg-light p-4 rounded">
+                        <p class="mb-0">{{ idea.proposed_solution|linebreaksbr }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card p-4 mb-4">
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">Status Details</h6>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-light rounded p-2 text-center me-3" style="width: 45px;">
+                            <i class="bi bi-clock-history text-muted"></i>
+                        </div>
+                        <div>
+                            <p class="small text-muted mb-0">Created</p>
+                            <p class="fw-medium mb-0 small">{{ idea.created_at|date:"F j, Y - g:i a" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-light rounded p-2 text-center me-3" style="width: 45px;">
+                            <i class="bi bi-arrow-clockwise text-muted"></i>
+                        </div>
+                        <div>
+                            <p class="small text-muted mb-0">Last Updated</p>
+                            <p class="fw-medium mb-0 small">{{ idea.updated_at|date:"F j, Y - g:i a" }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if idea.submitted_at %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-primary bg-opacity-10 rounded p-2 text-center me-3" style="width: 45px;">
+                            <i class="bi bi-send-check text-primary"></i>
+                        </div>
+                        <div>
+                            <p class="small text-muted mb-0">Submitted On</p>
+                            <p class="fw-medium mb-0 small">{{ idea.submitted_at|date:"F j, Y - g:i a" }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                {% if idea.status == 'draft' %}
+                    <div class="card p-4 border-primary border-opacity-50 shadow-sm">
+                        <h6 class="fw-bold text-primary mb-3">Ready to go?</h6>
+                        <p class="small text-muted mb-3">Your idea is currently a draft. Submit it when you are ready for mentors and experts to review it.</p>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'incubator:idea_edit' idea.id %}" class="btn btn-outline-primary fw-medium"><i class="bi bi-pencil me-1"></i> Edit Draft</a>
+                            <a href="{% url 'incubator:idea_submit' idea.id %}" class="btn btn-primary fw-bold"><i class="bi bi-send me-1"></i> Submit Idea</a>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock layout %}
