@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Milestone | StartupSphere{% endblock %}
+
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+
+    <main class="flex-grow-1 p-4" style="overflow-y: auto;">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card p-4">
+                    <div class="mb-4">
+                        <h3 class="fw-bold text-primary">Milestone</h3>
+                        <p class="text-muted">Update or create a milestone for {{ startup.name }}.</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label fw-medium">{{ field.label }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            {% if request.user.role == 'mentor' %}
+                                <a href="{% url 'incubator:startup_detail_id' startup.id %}" class="btn btn-light fw-medium">Cancel</a>
+                            {% else %}
+                                <a href="{% url 'incubator:startup_detail' %}" class="btn btn-light fw-medium">Cancel</a>
+                            {% endif %}
+                            <button type="submit" class="btn btn-primary fw-bold">Save Milestone</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock layout %}

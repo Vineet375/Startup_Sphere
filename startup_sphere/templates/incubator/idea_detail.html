@@ -56,9 +56,45 @@
                     </div>
 
                     <h5 class="fw-bold mb-3">Proposed Solution</h5>
-                    <div class="bg-light p-4 rounded">
+                    <div class="bg-light p-4 rounded mb-4">
                         <p class="mb-0">{{ idea.proposed_solution|linebreaksbr }}</p>
                     </div>
+
+                    <hr class="my-5">
+                    
+                    <h5 class="fw-bold mb-4">Mentor Feedback</h5>
+                    {% if feedbacks %}
+                        <div class="d-flex flex-column gap-4">
+                            {% for fb in feedbacks %}
+                                <div class="card bg-light border-0">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <h6 class="fw-bold text-main m-0">{{ fb.mentor.get_full_name|default:fb.mentor.username }} <span class="badge bg-secondary ms-1">Mentor</span></h6>
+                                            <small class="text-muted">{{ fb.created_at|date:"M d, Y" }}</small>
+                                        </div>
+                                        <p class="mb-0 text-muted">{{ fb.content|linebreaksbr }}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small">No feedback provided yet.</p>
+                    {% endif %}
+                    
+                    {% if feedback_form %}
+                        <div class="card mt-4 border-primary">
+                            <div class="card-body">
+                                <h6 class="fw-bold text-primary mb-3">Leave Feedback</h6>
+                                <form action="{% url 'incubator:add_feedback' idea.id %}" method="post">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        {{ feedback_form.content }}
+                                    </div>
+                                    <button type="submit" class="btn btn-primary fw-medium">Submit Feedback</button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
             
@@ -99,14 +135,25 @@
                     {% endif %}
                 </div>
                 
-                {% if idea.status == 'draft' %}
-                    <div class="card p-4 border-primary border-opacity-50 shadow-sm">
+                {% if request.user == idea.creator and idea.status == 'draft' %}
+                    <div class="card p-4 border-primary border-opacity-50 shadow-sm mb-4">
                         <h6 class="fw-bold text-primary mb-3">Ready to go?</h6>
                         <p class="small text-muted mb-3">Your idea is currently a draft. Submit it when you are ready for mentors and experts to review it.</p>
                         <div class="d-grid gap-2">
                             <a href="{% url 'incubator:idea_edit' idea.id %}" class="btn btn-outline-primary fw-medium"><i class="bi bi-pencil me-1"></i> Edit Draft</a>
                             <a href="{% url 'incubator:idea_submit' idea.id %}" class="btn btn-primary fw-bold"><i class="bi bi-send me-1"></i> Submit Idea</a>
                         </div>
+                    </div>
+                {% endif %}
+                
+                {% if request.user == idea.startup.mentor and idea.status == 'submitted' %}
+                    <div class="card p-4 border-info border-opacity-50 shadow-sm mb-4">
+                        <h6 class="fw-bold text-info mb-3">Mentor Actions</h6>
+                        <p class="small text-muted mb-3">This idea was submitted and is ready for your review.</p>
+                        <form action="{% url 'incubator:mark_under_review' idea.id %}" method="post" class="d-grid">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-info text-white fw-bold"><i class="bi bi-eye me-1"></i> Mark as Under Review</button>
+                        </form>
                     </div>
                 {% endif %}
             </div>

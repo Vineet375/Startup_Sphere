@@ -41,7 +41,7 @@
                         <i class="bi bi-flag fs-5 me-2"></i>
                         <span class="small fw-medium">Milestones</span>
                     </div>
-                    <h2 class="fw-bold mb-0 text-muted fs-4">N/A</h2>
+                    <h2 class="fw-bold mb-0">{% if startup %}{{ startup.milestones.count }}{% else %}0{% endif %}</h2>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
@@ -67,9 +67,16 @@
         <!-- Middle Row: Progress and Events -->
         <div class="row g-4 mb-4">
             <div class="col-md-7">
-                <div class="card p-4 h-100 bg-light border-0">
-                    <h6 class="fw-bold text-muted mb-3"><i class="bi bi-lock me-1"></i> Startup Milestones</h6>
-                    <p class="text-muted small m-0">Milestone tracking will be available in the upcoming Mentor & Progress batch. For now, focus on refining your ideas!</p>
+                <div class="card p-4 h-100 border-0">
+                    <h6 class="fw-bold text-main mb-3"><i class="bi bi-graph-up text-primary me-1"></i> Startup Milestones & Progress</h6>
+                    {% if startup %}
+                        <div class="progress mb-3" style="height: 20px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress_percentage }}%;" aria-valuenow="{{ progress_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ progress_percentage }}%</div>
+                        </div>
+                        <p class="text-muted small m-0">You have completed {{ progress_percentage }}% of your milestones. Go to your <a href="{% url 'incubator:startup_detail' %}">Startup Profile</a> to manage them.</p>
+                    {% else %}
+                        <p class="text-muted small m-0">Register your startup to track milestones and progress.</p>
+                    {% endif %}
                 </div>
             </div>
             <div class="col-md-5">

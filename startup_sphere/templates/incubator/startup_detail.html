@@ -52,12 +52,61 @@
                     <p class="fs-5 text-muted">{{ startup.tagline|default:"No tagline provided." }}</p>
                 </div>
                 
+                <div class="card p-4 mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h6 class="fw-bold m-0">Milestones</h6>
+                        {% if request.user == startup.mentor or request.user.role == 'admin' %}
+                            <a href="{% url 'incubator:milestone_create' startup.id %}" class="btn btn-primary btn-sm fw-medium">
+                                <i class="bi bi-plus me-1"></i> Add Milestone
+                            </a>
+                        {% endif %}
+                    </div>
+                    
+                    {% if milestones %}
+                        <div class="list-group list-group-flush">
+                            {% for milestone in milestones %}
+                                <div class="list-group-item px-0 py-3 border-bottom">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1 fw-bold text-main">{{ milestone.title }}</h6>
+                                            <p class="mb-1 text-muted small">{{ milestone.description|default:"No description" }}</p>
+                                            <div class="mt-2">
+                                                {% if milestone.status == 'pending' %}
+                                                    <span class="badge bg-secondary">Pending</span>
+                                                {% elif milestone.status == 'in_progress' %}
+                                                    <span class="badge bg-primary">In Progress</span>
+                                                {% elif milestone.status == 'completed' %}
+                                                    <span class="badge bg-success">Completed</span>
+                                                {% endif %}
+                                                <small class="text-muted ms-2"><i class="bi bi-calendar me-1"></i> {{ milestone.target_date|date:"M d, Y"|default:"No date" }}</small>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <a href="{% url 'incubator:milestone_update' milestone.id %}" class="btn btn-sm btn-outline-secondary">Update</a>
+                                            {% if request.user == startup.mentor or request.user.role == 'admin' %}
+                                                <form action="{% url 'incubator:milestone_delete' milestone.id %}" method="post" class="d-inline" onsubmit="return confirm('Delete milestone?');">
+                                                    {% csrf_token %}
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted small">No milestones added yet.</p>
+                    {% endif %}
+                </div>
+                
                 <div class="card p-4">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h6 class="fw-bold m-0">Submitted Ideas & Proposals</h6>
+                        {% if request.user == startup.founder %}
                         <a href="{% url 'incubator:idea_create' %}" class="btn btn-primary btn-sm fw-medium">
                             <i class="bi bi-plus me-1"></i> New Idea
                         </a>
+                        {% endif %}
                     </div>
                     
                     {% if startup.ideas.all %}
@@ -93,8 +142,10 @@
                     {% else %}
                         <div class="text-center py-5">
                             <div class="text-muted mb-3"><i class="bi bi-folder2-open fs-1"></i></div>
-                            <p class="text-muted">You haven't submitted any ideas yet.</p>
+                            <p class="text-muted">No ideas submitted yet.</p>
+                            {% if request.user == startup.founder %}
                             <a href="{% url 'incubator:idea_create' %}" class="btn btn-outline-primary btn-sm">Create Your First Idea</a>
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>

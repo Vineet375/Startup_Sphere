@@ -20,6 +20,7 @@ class Startup(models.Model):
     )
 
     founder = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='startup')
+    mentor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='mentored_startups', limit_choices_to={'role': 'mentor'})
     name = models.CharField(max_length=200)
     tagline = models.CharField(max_length=250)
     stage = models.CharField(max_length=20, choices=STAGE_CHOICES, default='idea')
@@ -55,3 +56,30 @@ class Idea(models.Model):
 
     def __str__(self):
         return self.title
+
+class Feedback(models.Model):
+    idea = models.ForeignKey(Idea, on_delete=models.CASCADE, related_name='feedbacks')
+    mentor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='feedbacks')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Feedback by {self.mentor.username} on {self.idea.title}"
+
+class Milestone(models.Model):
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+    )
+    
+    startup = models.ForeignKey(Startup, on_delete=models.CASCADE, related_name='milestones')
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    target_date = models.DateField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.startup.name}"

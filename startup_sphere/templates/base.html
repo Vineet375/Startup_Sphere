@@ -105,6 +105,29 @@
             border-radius: 8px;
         }
 
+        /* Fix for input-group border-radius regression */
+        .input-group > .form-control:not(:first-child) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .input-group > .form-control:not(:last-child) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .input-group > .input-group-text {
+            border-radius: 8px;
+            background-color: var(--bg-body);
+            border-color: var(--border-color);
+        }
+        .input-group > .input-group-text:not(:first-child) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .input-group > .input-group-text:not(:last-child) {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
         .form-control:focus, .form-select:focus {
             background-color: var(--bg-body);
             color: var(--text-main);

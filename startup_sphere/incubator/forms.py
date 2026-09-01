@@ -1,5 +1,5 @@
 from django import forms
-from .models import Startup, Idea
+from .models import Startup, Idea, Feedback, Milestone
 
 class StartupForm(forms.ModelForm):
     class Meta:
@@ -27,3 +27,32 @@ class IdeaForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs.update({'class': 'form-control'})
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 4, 'placeholder': 'Write your feedback here...'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
+
+class MilestoneForm(forms.ModelForm):
+    class Meta:
+        model = Milestone
+        fields = ['title', 'description', 'target_date', 'status']
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 3}),
+            'target_date': forms.DateInput(attrs={'type': 'date'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
+        if 'status' in self.fields:
+            self.fields['status'].widget.attrs.update({'class': 'form-select'})
