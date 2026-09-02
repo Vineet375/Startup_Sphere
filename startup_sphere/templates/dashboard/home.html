@@ -24,15 +24,35 @@
             {% endif %}
         </div>
 
+        {% if not startup %}
+        <div class="card bg-light border-primary p-5 text-center mb-4 border-opacity-50 border">
+            <h5 class="fw-bold text-primary mb-3"><i class="bi bi-rocket-takeoff me-2"></i>You haven't registered a startup yet.</h5>
+            <p class="text-muted">Register your startup to begin your incubation journey and track your progress.</p>
+            <div class="mt-3">
+                <a href="{% url 'incubator:register_startup' %}" class="btn btn-primary px-4 fw-medium">Register Startup</a>
+            </div>
+        </div>
+        {% else %}
         <!-- 4 KPI Cards -->
         <div class="row g-3 mb-4">
             <div class="col-md-6 col-lg-3">
                 <div class="card p-3 h-100 d-flex flex-column justify-content-center">
                     <div class="d-flex align-items-center mb-2 text-primary">
-                        <i class="bi bi-lightbulb fs-5 me-2"></i>
-                        <span class="small fw-medium">Ideas Submitted</span>
+                        <i class="bi bi-rocket fs-5 me-2"></i>
+                        <span class="small fw-medium">Incubation Status</span>
                     </div>
-                    <h2 class="fw-bold mb-0">{{ submitted_ideas }}</h2>
+                    <h5 class="fw-bold mb-0 text-dark">{{ startup.get_incubation_status_display }}</h5>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card p-3 h-100 d-flex flex-column justify-content-center">
+                    <div class="d-flex align-items-center mb-2 text-info">
+                        <i class="bi bi-person-badge fs-5 me-2"></i>
+                        <span class="small fw-medium">Assigned Mentor</span>
+                    </div>
+                    <h5 class="fw-bold mb-0 text-dark">
+                        {% if startup.mentor %}{{ startup.mentor.get_full_name|default:startup.mentor.username }}{% else %}<span class="text-muted fs-6">Not assigned yet</span>{% endif %}
+                    </h5>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
@@ -41,25 +61,22 @@
                         <i class="bi bi-flag fs-5 me-2"></i>
                         <span class="small fw-medium">Milestones</span>
                     </div>
-                    <h2 class="fw-bold mb-0">{% if startup %}{{ startup.milestones.count }}{% else %}0{% endif %}</h2>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="card p-3 h-100 d-flex flex-column justify-content-center">
-                    <div class="d-flex align-items-center mb-2 text-info">
-                        <i class="bi bi-currency-rupee fs-5 me-2"></i>
-                        <span class="small fw-medium">Funding Raised</span>
+                    <div class="d-flex align-items-baseline">
+                        <h4 class="fw-bold mb-0">{{ completed_milestones }}</h4>
+                        <span class="text-muted ms-1 small">/ {{ total_milestones }} completed</span>
                     </div>
-                    <h2 class="fw-bold mb-0 text-muted fs-4">N/A</h2>
                 </div>
             </div>
             <div class="col-md-6 col-lg-3">
                 <div class="card p-3 h-100 d-flex flex-column justify-content-center">
                     <div class="d-flex align-items-center mb-2 text-warning">
-                        <i class="bi bi-people fs-5 me-2"></i>
-                        <span class="small fw-medium">Team Members</span>
+                        <i class="bi bi-lightbulb fs-5 me-2"></i>
+                        <span class="small fw-medium">Ideas Active</span>
                     </div>
-                    <h2 class="fw-bold mb-0">{% if startup %}{{ team_members }}{% else %}0{% endif %}</h2>
+                    <div class="d-flex align-items-baseline">
+                        <h4 class="fw-bold mb-0">{{ submitted_ideas|add:under_review_ideas }}</h4>
+                        <span class="text-muted ms-1 small">({{ under_review_ideas }} in review)</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -69,20 +86,20 @@
             <div class="col-md-7">
                 <div class="card p-4 h-100 border-0">
                     <h6 class="fw-bold text-main mb-3"><i class="bi bi-graph-up text-primary me-1"></i> Startup Milestones & Progress</h6>
-                    {% if startup %}
-                        <div class="progress mb-3" style="height: 20px;">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress_percentage }}%;" aria-valuenow="{{ progress_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ progress_percentage }}%</div>
-                        </div>
-                        <p class="text-muted small m-0">You have completed {{ progress_percentage }}% of your milestones. Go to your <a href="{% url 'incubator:startup_detail' %}">Startup Profile</a> to manage them.</p>
-                    {% else %}
-                        <p class="text-muted small m-0">Register your startup to track milestones and progress.</p>
-                    {% endif %}
+                    <div class="progress mb-3" style="height: 20px;">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ progress_percentage }}%;" aria-valuenow="{{ progress_percentage }}" aria-valuemin="0" aria-valuemax="100">{{ progress_percentage }}%</div>
+                    </div>
+                    <p class="text-muted small m-0">You have completed {{ progress_percentage }}% of your milestones. Go to your <a href="{% url 'incubator:startup_detail' %}">Startup Profile</a> to manage them.</p>
                 </div>
             </div>
             <div class="col-md-5">
                 <div class="card p-4 h-100 bg-light border-0">
-                    <h6 class="fw-bold text-muted mb-3"><i class="bi bi-lock me-1"></i> Upcoming Events</h6>
-                    <p class="text-muted small m-0">Event integration is coming soon. Stay tuned for pitch days and workshops.</p>
+                    <h6 class="fw-bold text-muted mb-3"><i class="bi bi-info-circle me-1"></i> Mentor Information</h6>
+                    {% if startup.mentor %}
+                        <p class="text-muted small m-0">Your mentor is actively reviewing your progress. You can view their feedback on your submitted ideas.</p>
+                    {% else %}
+                        <p class="text-muted small m-0">A mentor has not been assigned to your startup yet. An admin will assign one soon.</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -92,27 +109,20 @@
             <div class="col-md-7">
                 <div class="card p-4 h-100">
                     <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h6 class="fw-bold m-0">Recent Ideas</h6>
-                        {% if startup %}
-                            <a href="{% url 'incubator:idea_list' %}" class="text-primary small text-decoration-none fw-medium">View All <i class="bi bi-arrow-right"></i></a>
-                        {% endif %}
+                        <h6 class="fw-bold m-0">Recent Activity</h6>
+                        <a href="{% url 'incubator:startup_detail' %}" class="text-primary small text-decoration-none fw-medium">View All <i class="bi bi-arrow-right"></i></a>
                     </div>
                     
-                    {% if startup and startup.ideas.all %}
-                        {% for idea in startup.ideas.all|slice:":3" %}
-                            <div class="d-flex align-items-start mb-3 border-bottom pb-3">
-                                <div class="text-primary me-3 mt-1">
-                                    {% if idea.status == 'draft' %}<i class="bi bi-file-earmark fs-5 text-secondary"></i>
-                                    {% elif idea.status == 'submitted' %}<i class="bi bi-send-check fs-5 text-primary"></i>
-                                    {% elif idea.status == 'approved' %}<i class="bi bi-check-circle fs-5 text-success"></i>
-                                    {% else %}<i class="bi bi-search fs-5 text-info"></i>{% endif %}
-                                </div>
-                                <div>
-                                    <p class="mb-0 small fw-bold"><a href="{% url 'incubator:idea_detail' idea.id %}" class="text-decoration-none text-main">{{ idea.title }}</a></p>
-                                    <p class="text-muted mb-0" style="font-size: 0.8rem;">Status: {{ idea.get_status_display }} • Updated {{ idea.updated_at|timesince }} ago</p>
-                                </div>
+                    {% if activities %}
+                        <div class="timeline ps-3 border-start border-2 border-primary border-opacity-25">
+                        {% for activity in activities %}
+                            <div class="position-relative mb-3 ps-3">
+                                <span class="position-absolute top-0 start-0 translate-middle p-1 bg-primary border border-light rounded-circle"></span>
+                                <p class="mb-0 small fw-medium">{{ activity.description }}</p>
+                                <p class="text-muted mb-0" style="font-size: 0.75rem;">{{ activity.created_at|date:"F j, Y - g:i a" }}</p>
                             </div>
                         {% endfor %}
+                        </div>
                     {% else %}
                         <div class="text-center py-4">
                             <p class="text-muted small">No recent activity to show.</p>
@@ -125,31 +135,21 @@
                 <div class="card p-4 h-100">
                     <h6 class="fw-bold mb-4">Quick Actions</h6>
                     
-                    {% if startup %}
-                        <a href="{% url 'incubator:idea_create' %}" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-main border rounded p-2 hover-bg-light">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="bi bi-lightbulb text-primary"></i>
-                                <span class="small fw-medium">Draft New Idea</span>
-                            </div>
-                            <i class="bi bi-arrow-right text-muted"></i>
-                        </a>
-                        
-                        <a href="{% url 'incubator:startup_detail' %}" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-main border rounded p-2 hover-bg-light">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="bi bi-rocket text-success"></i>
-                                <span class="small fw-medium">Manage Startup Profile</span>
-                            </div>
-                            <i class="bi bi-arrow-right text-muted"></i>
-                        </a>
-                    {% else %}
-                        <a href="{% url 'incubator:register_startup' %}" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-main border rounded p-2 hover-bg-light border-primary">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="bi bi-rocket text-primary"></i>
-                                <span class="small fw-bold text-primary">Register Your Startup</span>
-                            </div>
-                            <i class="bi bi-arrow-right text-primary"></i>
-                        </a>
-                    {% endif %}
+                    <a href="{% url 'incubator:idea_create' %}" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-main border rounded p-2 hover-bg-light">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-lightbulb text-primary"></i>
+                            <span class="small fw-medium">Draft New Idea</span>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted"></i>
+                    </a>
+                    
+                    <a href="{% url 'incubator:startup_detail' %}" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-main border rounded p-2 hover-bg-light">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-rocket text-success"></i>
+                            <span class="small fw-medium">Manage Startup Profile</span>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted"></i>
+                    </a>
                     
                     <a href="{% url 'dashboard:coming_soon' feature='funding' %}" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-muted border border-light rounded p-2">
                         <div class="d-flex align-items-center gap-2">
@@ -158,17 +158,10 @@
                         </div>
                         <i class="bi bi-lock text-muted"></i>
                     </a>
-                    
-                    <a href="{% url 'dashboard:coming_soon' feature='hiring' %}" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-muted border border-light rounded p-2">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-briefcase"></i>
-                            <span class="small fw-medium">Post a Job</span>
-                        </div>
-                        <i class="bi bi-lock text-muted"></i>
-                    </a>
                 </div>
             </div>
         </div>
+        {% endif %}
     </main>
 </div>
 {% endblock layout %}

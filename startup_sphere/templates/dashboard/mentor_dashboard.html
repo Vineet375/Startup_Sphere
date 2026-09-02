@@ -36,26 +36,73 @@
         </div>
 
         <div class="card p-4">
-            <h6 class="fw-bold mb-4">Your Startups</h6>
+            <h6 class="fw-bold mb-4">Your Startups Overview</h6>
             {% if mentored_startups %}
                 <div class="list-group list-group-flush">
                     {% for startup in mentored_startups %}
-                        <div class="list-group-item list-group-item-action px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="mb-1 fw-bold text-main">{{ startup.name }}</h6>
-                                <p class="mb-1 text-muted small">{{ startup.tagline }}</p>
-                                <div class="mt-1 small">
-                                    <span class="badge bg-secondary">{{ startup.get_stage_display }}</span>
-                                    <span class="badge bg-light text-dark border">{{ startup.ideas.count }} Ideas</span>
+                        <div class="list-group-item px-0 py-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h6 class="mb-1 fw-bold text-main">{{ startup.name }}</h6>
+                                    <p class="mb-1 text-muted small">Incubation Status: <span class="fw-medium text-dark">{{ startup.get_incubation_status_display }}</span></p>
+                                </div>
+                                <a href="{% url 'incubator:startup_detail_id' startup.id %}" class="btn btn-outline-primary btn-sm">Workspace</a>
+                            </div>
+                            
+                            <div class="row align-items-center mt-3">
+                                <div class="col-md-7">
+                                    <div class="d-flex justify-content-between mb-1">
+                                        <small class="text-muted">Milestone Progress</small>
+                                        <small class="fw-bold">{{ startup.progress_percentage }}%</small>
+                                    </div>
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ startup.progress_percentage }}%;" aria-valuenow="{{ startup.progress_percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-5 mt-3 mt-md-0 text-md-end">
+                                    {% if startup.pending_ideas_count > 0 %}
+                                        <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-circle me-1"></i>{{ startup.pending_ideas_count }} ideas need attention</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-muted border"><i class="bi bi-check-circle me-1"></i>All caught up</span>
+                                    {% endif %}
                                 </div>
                             </div>
-                            <a href="{% url 'incubator:startup_detail_id' startup.id %}" class="btn btn-outline-primary btn-sm">View Startup</a>
                         </div>
                     {% endfor %}
                 </div>
             {% else %}
                 <div class="text-center py-5">
+                    <h5 class="fw-bold text-muted mb-3"><i class="bi bi-inbox fs-2 d-block mb-2"></i>No Assigned Startups</h5>
                     <p class="text-muted">You haven't been assigned to mentor any startups yet.</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="card p-4 mt-4">
+            <h6 class="fw-bold mb-4">Ideas Requiring Attention</h6>
+            {% if pending_ideas %}
+                <div class="list-group list-group-flush">
+                    {% for idea in pending_ideas %}
+                        <div class="list-group-item list-group-item-action px-0 py-3 border-bottom d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1 fw-bold text-main">{{ idea.title }}</h6>
+                                <p class="mb-1 text-muted small">from {{ idea.startup.name }}</p>
+                                <div class="mt-1 small">
+                                    {% if idea.status == 'submitted' %}
+                                        <span class="badge bg-primary">Submitted</span>
+                                    {% elif idea.status == 'under_review' %}
+                                        <span class="badge bg-info">Under Review</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <a href="{% url 'incubator:idea_detail' idea.id %}" class="btn btn-outline-info btn-sm">Review Idea</a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <h5 class="fw-bold text-muted mb-3"><i class="bi bi-check-circle fs-2 d-block mb-2 text-success"></i>You're all caught up!</h5>
+                    <p class="text-muted">There are no ideas requiring your attention.</p>
                 </div>
             {% endif %}
         </div>

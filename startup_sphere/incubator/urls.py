@@ -7,6 +7,7 @@ urlpatterns = [
     # Startup management
     path('startup/', views.startup_detail, name='startup_detail'),
     path('startup/<int:startup_id>/', views.startup_detail, name='startup_detail_id'),
+    path('startup/<int:startup_id>/status/', views.startup_update_status, name='startup_update_status'),
     path('startup/register/', views.register_startup, name='register_startup'),
     path('startup/edit/', views.startup_edit, name='startup_edit'),
     
@@ -25,4 +26,9 @@ urlpatterns = [
     path('startups/<int:startup_id>/milestones/create/', views.milestone_create, name='milestone_create'),
     path('milestones/<int:milestone_id>/edit/', views.milestone_update, name='milestone_update'),
     path('milestones/<int:milestone_id>/delete/', views.milestone_delete, name='milestone_delete'),
+
+    # Notifications
+    path('notifications/', views.notification_list, name='notification_list'),
+    path('notifications/<int:notification_id>/read/', views.notification_mark_read, name='notification_mark_read'),
+    path('notifications/read-all/', views.notification_mark_all_read, name='notification_mark_all_read'),
 ]

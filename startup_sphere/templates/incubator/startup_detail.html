@@ -30,9 +30,29 @@
                     <h5 class="fw-bold mb-1">{{ startup.name }}</h5>
                     <p class="text-muted small mb-3">{{ startup.get_category_display }}</p>
                     
-                    <div class="d-inline-block px-3 py-1 rounded-pill bg-success bg-opacity-10 text-success fw-medium small mb-3">
+                    <div class="d-inline-block px-3 py-1 rounded-pill bg-success bg-opacity-10 text-success fw-medium small mb-1">
                         {{ startup.get_stage_display }}
                     </div>
+                    
+                    <div class="d-inline-block px-3 py-1 rounded-pill bg-info bg-opacity-10 text-info fw-medium small mb-3">
+                        {{ startup.get_incubation_status_display }}
+                    </div>
+                    
+                    {% if request.user == startup.mentor or request.user.role == 'admin' %}
+                    <form action="{% url 'incubator:startup_update_status' startup.id %}" method="post" class="mt-2">
+                        {% csrf_token %}
+                        <div class="input-group input-group-sm">
+                            <select name="incubation_status" class="form-select bg-light text-muted border-0">
+                                <option value="idea_stage" {% if startup.incubation_status == 'idea_stage' %}selected{% endif %}>Idea Stage</option>
+                                <option value="under_review" {% if startup.incubation_status == 'under_review' %}selected{% endif %}>Under Review</option>
+                                <option value="incubating" {% if startup.incubation_status == 'incubating' %}selected{% endif %}>Incubating</option>
+                                <option value="active" {% if startup.incubation_status == 'active' %}selected{% endif %}>Active</option>
+                                <option value="completed" {% if startup.incubation_status == 'completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </div>
+                    </form>
+                    {% endif %}
                     
                     <hr class="my-3">
                     
@@ -63,6 +83,35 @@
                     </div>
                     
                     {% if milestones %}
+                        <div class="row g-2 mb-4 text-center small">
+                            <div class="col">
+                                <div class="bg-light p-2 rounded">
+                                    <div class="fw-bold fs-5">{{ milestone_stats.total }}</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Total</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="bg-light p-2 rounded">
+                                    <div class="fw-bold fs-5 text-secondary">{{ milestone_stats.pending }}</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Pending</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="bg-light p-2 rounded">
+                                    <div class="fw-bold fs-5 text-primary">{{ milestone_stats.in_progress }}</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">In Progress</div>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="bg-light p-2 rounded">
+                                    <div class="fw-bold fs-5 text-success">{{ milestone_stats.completed }}</div>
+                                    <div class="text-muted" style="font-size: 0.75rem;">Completed</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="progress mb-4" style="height: 6px;">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ milestone_stats.percentage }}%;" aria-valuenow="{{ milestone_stats.percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
                         <div class="list-group list-group-flush">
                             {% for milestone in milestones %}
                                 <div class="list-group-item px-0 py-3 border-bottom">
@@ -109,43 +158,73 @@
                         {% endif %}
                     </div>
                     
-                    {% if startup.ideas.all %}
+                    {% if visible_ideas %}
                         <div class="list-group list-group-flush">
-                            {% for idea in startup.ideas.all|slice:":3" %}
-                                <a href="{% url 'incubator:idea_detail' idea.id %}" class="list-group-item list-group-item-action px-0 py-3 border-bottom">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1 fw-bold text-main">{{ idea.title }}</h6>
-                                        <small class="text-muted">{{ idea.updated_at|timesince }} ago</small>
+                            {% for idea in visible_ideas|slice:":3" %}
+                                <a href="{% url 'incubator:idea_detail' idea.id %}" class="list-group-item list-group-item-action p-3">
+                                    <div class="d-flex w-100 justify-content-between mb-1">
+                                        <h6 class="mb-1 fw-bold">{{ idea.title }}</h6>
+                                        <small>
+                                            {% if idea.status == 'draft' %}
+                                                <span class="badge bg-secondary">Draft</span>
+                                            {% elif idea.status == 'submitted' %}
+                                                <span class="badge bg-primary">Submitted</span>
+                                            {% elif idea.status == 'under_review' %}
+                                                <span class="badge bg-info">Under Review</span>
+                                            {% elif idea.status == 'approved' %}
+                                                <span class="badge bg-success">Approved</span>
+                                            {% elif idea.status == 'rejected' %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% endif %}
+                                        </small>
                                     </div>
-                                    <p class="mb-1 text-muted small text-truncate">{{ idea.description }}</p>
-                                    <div class="mt-2">
-                                        {% if idea.status == 'draft' %}
-                                            <span class="badge bg-secondary">Draft</span>
-                                        {% elif idea.status == 'submitted' %}
-                                            <span class="badge bg-primary">Submitted</span>
-                                        {% elif idea.status == 'under_review' %}
-                                            <span class="badge bg-info">Under Review</span>
-                                        {% elif idea.status == 'approved' %}
-                                            <span class="badge bg-success">Approved</span>
-                                        {% elif idea.status == 'rejected' %}
-                                            <span class="badge bg-danger">Rejected</span>
-                                        {% endif %}
-                                    </div>
+                                    <p class="mb-1 small text-muted text-truncate">{{ idea.description }}</p>
+                                    <small class="text-muted">Updated {{ idea.updated_at|timesince }} ago</small>
                                 </a>
                             {% endfor %}
                         </div>
-                        {% if startup.ideas.count > 3 %}
-                            <div class="text-center mt-3">
-                                <a href="{% url 'incubator:idea_list' %}" class="text-primary text-decoration-none small fw-medium">View All Ideas <i class="bi bi-arrow-right"></i></a>
+                        {% if visible_ideas|length > 3 %}
+                            <div class="card-footer bg-white text-center border-top-0 pt-0">
+                                {% if request.user == startup.founder %}
+                                    <a href="{% url 'incubator:idea_list' %}" class="text-primary text-decoration-none small fw-medium">View All Ideas</a>
+                                {% else %}
+                                    <span class="text-muted small">Showing 3 of {{ visible_ideas|length }} ideas</span>
+                                {% endif %}
                             </div>
                         {% endif %}
                     {% else %}
-                        <div class="text-center py-5">
-                            <div class="text-muted mb-3"><i class="bi bi-folder2-open fs-1"></i></div>
-                            <p class="text-muted">No ideas submitted yet.</p>
-                            {% if request.user == startup.founder %}
-                            <a href="{% url 'incubator:idea_create' %}" class="btn btn-outline-primary btn-sm">Create Your First Idea</a>
-                            {% endif %}
+                        <div class="text-center py-4">
+                            <div class="text-muted mb-2"><i class="bi bi-lightbulb fs-3"></i></div>
+                            <p class="text-muted small mb-0">
+                                {% if request.user.role == 'mentor' %}
+                                    No ideas have been submitted yet.
+                                {% else %}
+                                    No ideas yet. Create your first idea to get started.
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="card p-4 mt-4 mb-4">
+                    <h6 class="fw-bold mb-4">Recent Activity</h6>
+                    
+                    {% if activities %}
+                        <div class="timeline ps-3 border-start border-2 border-primary border-opacity-25 ms-2">
+                        {% for activity in activities %}
+                            <div class="position-relative mb-4 ps-4">
+                                <span class="position-absolute top-0 start-0 translate-middle p-2 
+                                    {% if 'review' in activity.activity_type or 'feedback' in activity.activity_type %}bg-warning
+                                    {% elif 'completed' in activity.activity_type or 'approved' in activity.activity_type %}bg-success
+                                    {% else %}bg-primary{% endif %} border border-light border-2 rounded-circle"></span>
+                                <p class="mb-1 fw-medium text-dark">{{ activity.description }}</p>
+                                <p class="text-muted small mb-0">{{ activity.created_at|date:"F j, Y - g:i a" }}</p>
+                            </div>
+                        {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-muted small">No recent activity to show.</p>
                         </div>
                     {% endif %}
                 </div>

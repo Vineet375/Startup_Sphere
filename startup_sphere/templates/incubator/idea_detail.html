@@ -8,9 +8,15 @@
 
     <main class="flex-grow-1 p-4" style="overflow-y: auto;">
         <div class="mb-4">
+            {% if request.user.role == 'founder' %}
             <a href="{% url 'incubator:idea_list' %}" class="text-muted text-decoration-none small fw-medium">
                 <i class="bi bi-arrow-left"></i> Back to Ideas
             </a>
+            {% else %}
+            <a href="{% url 'dashboard:home' %}" class="text-muted text-decoration-none small fw-medium">
+                <i class="bi bi-arrow-left"></i> Back to Dashboard
+            </a>
+            {% endif %}
         </div>
 
         <div class="row">
@@ -70,7 +76,7 @@
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
                                             <h6 class="fw-bold text-main m-0">{{ fb.mentor.get_full_name|default:fb.mentor.username }} <span class="badge bg-secondary ms-1">Mentor</span></h6>
-                                            <small class="text-muted">{{ fb.created_at|date:"M d, Y" }}</small>
+                                            <small class="text-muted">{{ fb.created_at|date:"F j, Y - g:i a" }}</small>
                                         </div>
                                         <p class="mb-0 text-muted">{{ fb.content|linebreaksbr }}</p>
                                     </div>
@@ -130,6 +136,18 @@
                         <div>
                             <p class="small text-muted mb-0">Submitted On</p>
                             <p class="fw-medium mb-0 small">{{ idea.submitted_at|date:"F j, Y - g:i a" }}</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if idea.under_review_at %}
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-info bg-opacity-10 rounded p-2 text-center me-3" style="width: 45px;">
+                            <i class="bi bi-eye text-info"></i>
+                        </div>
+                        <div>
+                            <p class="small text-muted mb-0">Under Review</p>
+                            <p class="fw-medium mb-0 small">{{ idea.under_review_at|date:"F j, Y - g:i a" }}</p>
                         </div>
                     </div>
                     {% endif %}

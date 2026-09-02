@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect, get_object_or_404
+﻿from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.contrib import messages
 from django.utils import timezone
-from .models import Startup, Idea, Feedback, Milestone
+from .models import Startup, Idea, Feedback, Milestone, Activity, Notification
 from .forms import StartupForm, IdeaForm, FeedbackForm, MilestoneForm
 
 @login_required
@@ -34,6 +35,12 @@ def register_startup(request):
             startup = form.save(commit=False)
             startup.founder = request.user
             startup.save()
+            Activity.objects.create(
+                startup=startup,
+                user=request.user,
+                activity_type='startup_registered',
+                description=f'Startup "{startup.name}" was registered.'
+            )
             messages.success(request, "Your startup has been registered successfully!")
             return redirect('incubator:startup_detail')
     else:
@@ -104,6 +111,22 @@ def idea_create(request):
             if 'submit' in request.POST:
                 idea.status = 'submitted'
                 idea.submitted_at = timezone.now()
+                Activity.objects.create(
+                    startup=startup,
+                    user=request.user,
+                    activity_type='idea_submitted',
+                    description=f'Idea "{idea.title}" was submitted.'
+                )
+                if startup.mentor:
+                    Notification.objects.create(
+                        recipient=startup.mentor,
+                        actor=request.user,
+                        startup=startup,
+                        title="Idea Submitted",
+                        message=f"{startup.name} has submitted a new idea: {idea.title}.",
+                        notification_type='idea_submitted',
+                        link_url=reverse('incubator:idea_detail', args=[idea.id])
+                    )
                 messages.success(request, "Your idea has been submitted successfully!")
             else:
                 idea.status = 'draft'
@@ -132,6 +155,22 @@ def idea_edit(request, idea_id):
             if 'submit' in request.POST:
                 idea.status = 'submitted'
                 idea.submitted_at = timezone.now()
+                Activity.objects.create(
+                    startup=idea.startup,
+                    user=request.user,
+                    activity_type='idea_submitted',
+                    description=f'Idea "{idea.title}" was submitted.'
+                )
+                if idea.startup.mentor:
+                    Notification.objects.create(
+                        recipient=idea.startup.mentor,
+                        actor=request.user,
+                        startup=idea.startup,
+                        title="Idea Submitted",
+                        message=f"{idea.startup.name} has submitted a new idea: {idea.title}.",
+                        notification_type='idea_submitted',
+                        link_url=reverse('incubator:idea_detail', args=[idea.id])
+                    )
                 messages.success(request, "Your idea has been submitted successfully!")
             else:
                 messages.success(request, "Your draft has been updated.")
@@ -155,6 +194,22 @@ def idea_submit(request, idea_id):
         idea.status = 'submitted'
         idea.submitted_at = timezone.now()
         idea.save()
+        Activity.objects.create(
+            startup=idea.startup,
+            user=request.user,
+            activity_type='idea_submitted',
+            description=f'Idea "{idea.title}" was submitted.'
+        )
+        if idea.startup.mentor:
+            Notification.objects.create(
+                recipient=idea.startup.mentor,
+                actor=request.user,
+                startup=idea.startup,
+                title="Idea Submitted",
+                message=f"{idea.startup.name} has submitted a new idea: {idea.title}.",
+                notification_type='idea_submitted',
+                link_url=reverse('incubator:idea_detail', args=[idea.id])
+            )
         messages.success(request, "Your idea has been submitted successfully!")
         return redirect('incubator:idea_list')
         
@@ -173,6 +228,21 @@ def add_feedback(request, idea_id):
             feedback.idea = idea
             feedback.mentor = request.user
             feedback.save()
+            Activity.objects.create(
+                startup=idea.startup,
+                user=request.user,
+                activity_type='feedback_added',
+                description=f'Mentor provided feedback on "{idea.title}".'
+            )
+            Notification.objects.create(
+                recipient=idea.startup.founder,
+                actor=request.user,
+                startup=idea.startup,
+                title="New Feedback Received",
+                message=f"Mentor {request.user.get_full_name() or request.user.username} provided feedback on your idea: {idea.title}.",
+                notification_type='feedback_received',
+                link_url=reverse('incubator:idea_detail', args=[idea.id])
+            )
             messages.success(request, "Feedback submitted successfully.")
             
     return redirect('incubator:idea_detail', idea_id=idea.id)
@@ -186,6 +256,21 @@ def mark_under_review(request, idea_id):
     if request.method == 'POST' and idea.status == 'submitted':
         idea.status = 'under_review'
         idea.save()
+        Activity.objects.create(
+            startup=idea.startup,
+            user=request.user,
+            activity_type='idea_under_review',
+            description=f'Mentor marked the idea "{idea.title}" as Under Review.'
+        )
+        Notification.objects.create(
+            recipient=idea.startup.founder,
+            actor=request.user,
+            startup=idea.startup,
+            title="Idea Under Review",
+            message=f'Your idea "{idea.title}" is now under review.',
+            notification_type='idea_under_review',
+            link_url=reverse('incubator:idea_detail', args=[idea.id])
+        )
         messages.success(request, "Idea status changed to Under Review.")
         
     return redirect('incubator:idea_detail', idea_id=idea.id)
@@ -203,6 +288,21 @@ def milestone_create(request, startup_id):
             milestone = form.save(commit=False)
             milestone.startup = startup
             milestone.save()
+            Activity.objects.create(
+                startup=startup,
+                user=request.user,
+                activity_type='milestone_created',
+                description=f'Milestone "{milestone.title}" was created.'
+            )
+            Notification.objects.create(
+                recipient=startup.founder,
+                actor=request.user,
+                startup=startup,
+                title="New Milestone Created",
+                message=f'A new milestone "{milestone.title}" has been created for your startup.',
+                notification_type='milestone_created',
+                link_url=reverse('incubator:startup_detail')
+            )
             messages.success(request, "Milestone created successfully.")
             return redirect('incubator:startup_detail_id', startup_id=startup.id) if request.user.role == 'mentor' else redirect('incubator:startup_detail')
     
@@ -224,6 +324,7 @@ def milestone_update(request, milestone_id):
         raise PermissionDenied("You do not have permission to update this milestone.")
         
     if request.method == 'POST':
+        old_status = milestone.status
         if is_mentor_or_admin:
             form = MilestoneForm(request.POST, instance=milestone)
         else:
@@ -233,11 +334,41 @@ def milestone_update(request, milestone_id):
             if new_status in dict(Milestone.STATUS_CHOICES):
                 milestone.status = new_status
                 milestone.save()
+                if old_status != 'completed' and new_status == 'completed':
+                    Activity.objects.create(
+                        startup=startup, user=request.user, activity_type='milestone_completed',
+                        description=f'Milestone "{milestone.title}" was completed.'
+                    )
+                    if startup.mentor:
+                        Notification.objects.create(
+                            recipient=startup.mentor,
+                            actor=request.user,
+                            startup=startup,
+                            title="Milestone Completed",
+                            message=f'Milestone "{milestone.title}" for {startup.name} was marked as completed.',
+                            notification_type='milestone_completed',
+                            link_url=reverse('incubator:startup_detail_id', args=[startup.id])
+                        )
+                elif old_status != new_status:
+                    Activity.objects.create(
+                        startup=startup, user=request.user, activity_type='milestone_updated',
+                        description=f'Milestone "{milestone.title}" status changed to {dict(Milestone.STATUS_CHOICES).get(new_status, new_status)}.'
+                    )
                 messages.success(request, "Milestone status updated.")
                 return redirect('incubator:startup_detail')
                 
         if form.is_valid() and is_mentor_or_admin:
-            form.save()
+            milestone = form.save()
+            if old_status != 'completed' and milestone.status == 'completed':
+                Activity.objects.create(
+                    startup=startup, user=request.user, activity_type='milestone_completed',
+                    description=f'Milestone "{milestone.title}" was completed.'
+                )
+            else:
+                Activity.objects.create(
+                    startup=startup, user=request.user, activity_type='milestone_updated',
+                    description=f'Milestone "{milestone.title}" was updated.'
+                )
             messages.success(request, "Milestone updated successfully.")
             return redirect('incubator:startup_detail_id', startup_id=startup.id) if request.user.role == 'mentor' else redirect('incubator:startup_detail')
             
@@ -263,3 +394,49 @@ def milestone_delete(request, milestone_id):
         messages.success(request, "Milestone deleted successfully.")
         
     return redirect('incubator:startup_detail_id', startup_id=startup.id) if request.user.role == 'mentor' else redirect('incubator:startup_detail')
+
+
+from django.views.decorators.http import require_POST
+
+@login_required
+def notification_list(request):
+    notifications = request.user.notifications.all()
+    return render(request, 'incubator/notification_list.html', {'notifications': notifications})
+
+@login_required
+@require_POST
+def notification_mark_read(request, notification_id):
+    notification = get_object_or_404(Notification, id=notification_id, recipient=request.user)
+    notification.is_read = True
+    notification.save()
+    
+    # After marking as read, optionally redirect to the link URL if provided in the form POST (as a next parameter)
+    # But for a simple AJAX or form submit, we might just redirect back to notifications page
+    next_url = request.POST.get('next')
+    if next_url:
+        return redirect(next_url)
+    return redirect('incubator:notification_list')
+
+@login_required
+@require_POST
+def notification_mark_all_read(request):
+    request.user.notifications.filter(is_read=False).update(is_read=True)
+    messages.success(request, "All notifications marked as read.")
+    return redirect('incubator:notification_list')
+
+
+@login_required
+def startup_update_status(request, startup_id):
+    startup = get_object_or_404(Startup, id=startup_id)
+    
+    if request.user != startup.mentor and request.user.role != 'admin':
+        raise PermissionDenied("Only the assigned mentor or an admin can update the incubation status.")
+        
+    if request.method == 'POST':
+        new_status = request.POST.get('incubation_status')
+        if new_status in dict(Startup.INCUBATION_CHOICES):
+            startup.incubation_status = new_status
+            startup.save()
+            messages.success(request, "Startup incubation status updated.")
+            
+    return redirect('incubator:startup_detail_id', startup_id=startup.id)

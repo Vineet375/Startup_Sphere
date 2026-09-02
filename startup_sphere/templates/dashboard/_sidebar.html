@@ -6,6 +6,7 @@
             Dashboard
         </a>
         
+        {% if request.user.role == 'founder' %}
         <a href="{% url 'incubator:startup_detail' %}" class="nav-link {% if 'startup' in request.resolver_match.url_name %}active{% endif %}">
             <i class="bi bi-rocket"></i>
             My Startup
@@ -15,6 +16,7 @@
             <i class="bi bi-lightbulb"></i>
             My Ideas
         </a>
+        {% endif %}
         
         <a href="{% url 'dashboard:coming_soon' feature='funding' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'funding' %}active{% endif %}">
             <i class="bi bi-currency-dollar"></i>
