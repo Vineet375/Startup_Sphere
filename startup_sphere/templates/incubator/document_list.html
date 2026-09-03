@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block title %}Documents | StartupSphere{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4" style="overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Documents & Resources</h4>
+            {% if request.user == startup.founder %}
+            <a href="{% url 'incubator:document_upload' %}" class="btn btn-primary btn-sm fw-medium">
+                <i class="bi bi-upload me-1"></i> Upload Document
+            </a>
+            {% endif %}
+        </div>
+        
+        <div class="card p-0 overflow-hidden">
+            <div class="bg-light p-3 border-bottom d-flex gap-2 overflow-auto" style="white-space: nowrap;">
+                <a href="?category=" class="btn btn-sm {% if not current_category %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">All Documents</a>
+                <a href="?category=pitch_deck" class="btn btn-sm {% if current_category == 'pitch_deck' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Pitch Decks</a>
+                <a href="?category=business_plan" class="btn btn-sm {% if current_category == 'business_plan' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Business Plans</a>
+                <a href="?category=financial" class="btn btn-sm {% if current_category == 'financial' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Financial</a>
+                <a href="?category=legal" class="btn btn-sm {% if current_category == 'legal' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Legal</a>
+                <a href="?category=product" class="btn btn-sm {% if current_category == 'product' %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill">Product</a>
+            </div>
+            
+            <div class="p-4">
+                {% if documents %}
+                    <div class="row g-4">
+                        {% for doc in documents %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 border hover-shadow transition">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-3">
+                                        <div class="bg-primary bg-opacity-10 text-primary rounded p-2 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                            <i class="bi bi-file-earmark-text fs-5"></i>
+                                        </div>
+                                        <span class="badge bg-light text-dark border">{{ doc.get_category_display }}</span>
+                                    </div>
+                                    <h6 class="fw-bold mb-2 text-truncate" title="{{ doc.title }}">{{ doc.title }}</h6>
+                                    <p class="small text-muted mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; height: 3em;">
+                                        {{ doc.description|default:"No description" }}
+                                    </p>
+                                    <div class="d-flex align-items-center text-muted small">
+                                        <i class="bi bi-person me-1"></i> {{ doc.uploaded_by.get_full_name|default:doc.uploaded_by.username }}
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white border-top d-flex justify-content-between align-items-center py-3">
+                                    <small class="text-muted">{{ doc.created_at|date:"M d, Y" }}</small>
+                                    <div class="d-flex gap-2">
+                                        <a href="{{ doc.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary" title="Download/View">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                        {% if request.user == startup.founder %}
+                                        <a href="{% url 'incubator:document_edit' doc.id %}" class="btn btn-sm btn-outline-secondary" title="Edit Metadata">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form action="{% url 'incubator:document_delete' doc.id %}" method="post" class="m-0" onsubmit="return confirm('Delete this document?');">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-folder-x text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3 mb-0">No documents have been uploaded yet. Keep your important startup resources organized here.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

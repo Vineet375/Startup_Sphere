@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}My Team | StartupSphere{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4" style="overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">{% if request.user == startup.founder or request.user.role == 'mentor' or request.user.role == 'admin' %}{{ startup.name }} Team{% else %}My Team{% endif %}</h4>
+            {% if request.user == startup.founder %}
+            <a href="{% url 'incubator:team_invite' %}" class="btn btn-primary btn-sm fw-medium">
+                <i class="bi bi-person-plus me-1"></i> Invite Member
+            </a>
+            {% endif %}
+        </div>
+        
+        <div class="card p-4">
+            <h5 class="fw-bold mb-3">Founder</h5>
+            <div class="list-group mb-4">
+                <div class="list-group-item d-flex justify-content-between align-items-center p-3">
+                    <div class="d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                            <i class="bi bi-person-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0 fw-bold">{{ startup.founder.get_full_name|default:startup.founder.username }}</h6>
+                            <small class="text-muted">{{ startup.founder.email }}</small>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="badge bg-success">Founder & Owner</span>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="fw-bold mb-3">Team Members</h5>
+            {% if team_members %}
+                <div class="list-group">
+                {% for member in team_members %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center p-3">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                <i class="bi bi-person fs-4"></i>
+                            </div>
+                            <div>
+                                {% if member.user %}
+                                    <h6 class="mb-0 fw-bold">{{ member.user.get_full_name|default:member.user.username }}</h6>
+                                    <small class="text-muted">{{ member.user.email }}</small>
+                                {% else %}
+                                    <h6 class="mb-0 fw-bold text-muted">{{ member.invited_email }}</h6>
+                                    <small class="text-muted">Awaiting Registration</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-3">
+                            <div>
+                                <span class="badge bg-light text-dark border">{{ member.get_position_display }}</span>
+                                {% if member.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark ms-1">Pending</span>
+                                {% else %}
+                                    <span class="badge bg-success ms-1">Active</span>
+                                {% endif %}
+                            </div>
+                            
+                            {% if request.user == startup.founder %}
+                                <a href="{% url 'incubator:team_member_edit' member.id %}" class="btn btn-sm btn-outline-primary" title="Edit Position">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form action="{% url 'incubator:team_remove' member.id %}" method="post" class="m-0" onsubmit="return confirm('Are you sure you want to remove this team member?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="bi bi-person-x"></i></button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5 bg-light rounded">
+                    <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-3 mb-0">Your startup team currently consists of you. Add team members to start building your team.</p>
+                </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+{% endblock %}

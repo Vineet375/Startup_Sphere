@@ -31,4 +31,18 @@ urlpatterns = [
     path('notifications/', views.notification_list, name='notification_list'),
     path('notifications/<int:notification_id>/read/', views.notification_mark_read, name='notification_mark_read'),
     path('notifications/read-all/', views.notification_mark_all_read, name='notification_mark_all_read'),
+
+    # Team Management
+    path('team/', views.team_list, name='team_list'),
+    path('startups/<int:startup_id>/team/', views.team_list, name='team_list_id'),
+    path('team/invite/', views.team_invite, name='team_invite'),
+    path('team/<int:member_id>/edit/', views.team_member_edit, name='team_member_edit'),
+    path('team/<int:member_id>/remove/', views.team_remove, name='team_remove'),
+
+    # Document Management
+    path('documents/', views.document_list, name='document_list'),
+    path('startups/<int:startup_id>/documents/', views.document_list, name='document_list_id'),
+    path('documents/upload/', views.document_upload, name='document_upload'),
+    path('documents/<int:document_id>/edit/', views.document_edit, name='document_edit'),
+    path('documents/<int:document_id>/delete/', views.document_delete, name='document_delete'),
 ]

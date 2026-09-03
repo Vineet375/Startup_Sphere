@@ -107,8 +107,14 @@ class Activity(models.Model):
         ('milestone_created', 'Milestone Created'),
         ('milestone_updated', 'Milestone Updated'),
         ('milestone_completed', 'Milestone Completed'),
+        ('team_member_added', 'Team Member Added'),
+        ('pending_invitation_created', 'Pending Invitation Created'),
+        ('team_member_removed', 'Team Member Removed'),
+        ('team_member_updated', 'Team Member Updated'),
+        ('document_uploaded', 'Document Uploaded'),
+        ('document_deleted', 'Document Deleted'),
+        ('document_updated', 'Document Updated'),
     )
-
     startup = models.ForeignKey(Startup, on_delete=models.CASCADE, related_name='activities')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='activities')
     activity_type = models.CharField(max_length=50, choices=ACTIVITY_TYPES)
@@ -128,8 +134,9 @@ class Notification(models.Model):
         ('feedback_received', 'Feedback Received'),
         ('milestone_created', 'Milestone Created'),
         ('milestone_completed', 'Milestone Completed'),
+        ('team_member_added', 'Team Member Added'),
+        ('document_uploaded', 'Document Uploaded'),
     )
-
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='actor_notifications')
     startup = models.ForeignKey(Startup, on_delete=models.CASCADE, null=True, blank=True, related_name='notifications')
@@ -145,3 +152,64 @@ class Notification(models.Model):
 
     def __str__(self):
         return f"Notification for {self.recipient.username}: {self.title}"
+
+from django.core.validators import FileExtensionValidator
+
+class TeamMember(models.Model):
+    POSITION_CHOICES = (
+        ('founder', 'Founder'),
+        ('cofounder', 'Co-Founder'),
+        ('cto', 'CTO'),
+        ('ceo', 'CEO'),
+        ('coo', 'COO'),
+        ('developer', 'Developer'),
+        ('designer', 'Designer'),
+        ('marketing', 'Marketing'),
+        ('finance', 'Finance'),
+        ('other', 'Other'),
+    )
+    
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('active', 'Active'),
+    )
+
+    startup = models.ForeignKey(Startup, on_delete=models.CASCADE, related_name='team_members')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='startup_teams')
+    invited_email = models.EmailField(blank=True, null=True)
+    position = models.CharField(max_length=50, choices=POSITION_CHOICES, default='other')
+    custom_position = models.CharField(max_length=100, blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    joined_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        if self.user:
+            return f"{self.user.username} - {self.startup.name}"
+        return f"{self.invited_email} (Pending) - {self.startup.name}"
+
+class Document(models.Model):
+    CATEGORY_CHOICES = (
+        ('pitch_deck', 'Pitch Deck'),
+        ('business_plan', 'Business Plan'),
+        ('financial', 'Financial Document'),
+        ('product', 'Product Document'),
+        ('legal', 'Legal Document'),
+        ('market_research', 'Market Research'),
+        ('other', 'Other'),
+    )
+
+    startup = models.ForeignKey(Startup, on_delete=models.CASCADE, related_name='documents')
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='other')
+    file = models.FileField(
+        upload_to='startup_documents/',
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'])]
+    )
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.title} - {self.startup.name}"

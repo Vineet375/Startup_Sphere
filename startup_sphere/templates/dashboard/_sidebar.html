@@ -6,7 +6,7 @@
             Dashboard
         </a>
         
-        {% if request.user.role == 'founder' %}
+        {% if request.user.role == 'founder' or request.user.startup_teams.exists %}
         <a href="{% url 'incubator:startup_detail' %}" class="nav-link {% if 'startup' in request.resolver_match.url_name %}active{% endif %}">
             <i class="bi bi-rocket"></i>
             My Startup
@@ -15,6 +15,16 @@
         <a href="{% url 'incubator:idea_list' %}" class="nav-link {% if 'idea' in request.resolver_match.url_name %}active{% endif %}">
             <i class="bi bi-lightbulb"></i>
             My Ideas
+        </a>
+        
+        <a href="{% url 'incubator:team_list' %}" class="nav-link {% if 'team' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-people"></i>
+            My Team
+        </a>
+        
+        <a href="{% url 'incubator:document_list' %}" class="nav-link {% if 'document' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-folder2-open"></i>
+            Documents
         </a>
         {% endif %}
         
@@ -46,11 +56,6 @@
         <a href="{% url 'dashboard:coming_soon' feature='messages' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'messages' %}active{% endif %}">
             <i class="bi bi-chat-left-dots"></i>
             Messages
-        </a>
-        
-        <a href="{% url 'dashboard:coming_soon' feature='documents' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'documents' %}active{% endif %}">
-            <i class="bi bi-folder2-open"></i>
-            Documents
         </a>
         
         <a href="{% url 'dashboard:coming_soon' feature='analytics' %}" class="nav-link {% if request.resolver_match.url_name == 'coming_soon' and feature_slug == 'analytics' %}active{% endif %}">

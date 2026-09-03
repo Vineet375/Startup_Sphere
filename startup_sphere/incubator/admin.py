@@ -23,3 +23,6 @@ class MilestoneAdmin(admin.ModelAdmin):
     list_display = ('title', 'startup', 'status', 'target_date')
     list_filter = ('status', 'target_date')
     search_fields = ('title', 'startup__name', 'description')
+from .models import TeamMember, Document
+admin.site.register(TeamMember)
+admin.site.register(Document)
