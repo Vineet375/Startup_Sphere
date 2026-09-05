@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}{% if evaluation %}Edit{% else %}Create{% endif %} Evaluation | StartupSphere{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 d-flex justify-content-center align-items-start" style="overflow-y: auto;">
+        <div class="card p-4 shadow-sm w-100 mt-4" style="max-width: 700px;">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold m-0">{% if evaluation %}Edit Evaluation{% else %}Evaluate Startup{% endif %}</h4>
+                <span class="badge bg-light text-dark border">{{ startup.name }}</span>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="alert alert-info py-2 small">
+                    <i class="bi bi-info-circle me-1"></i> Rate the startup across these 5 dimensions on a scale of 1 to 10. The overall score will be calculated automatically.
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label class="form-label fw-medium">Innovation Score (1-10)</label>
+                        {{ form.innovation_score }}
+                        {% if form.innovation_score.errors %}<div class="text-danger small mt-1">{{ form.innovation_score.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Market Potential Score (1-10)</label>
+                        {{ form.market_potential_score }}
+                        {% if form.market_potential_score.errors %}<div class="text-danger small mt-1">{{ form.market_potential_score.errors }}</div>{% endif %}
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <label class="form-label fw-medium">Business Model Score (1-10)</label>
+                        {{ form.business_model_score }}
+                        {% if form.business_model_score.errors %}<div class="text-danger small mt-1">{{ form.business_model_score.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Team Score (1-10)</label>
+                        {{ form.team_score }}
+                        {% if form.team_score.errors %}<div class="text-danger small mt-1">{{ form.team_score.errors }}</div>{% endif %}
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-medium">Execution Score (1-10)</label>
+                        {{ form.execution_score }}
+                        {% if form.execution_score.errors %}<div class="text-danger small mt-1">{{ form.execution_score.errors }}</div>{% endif %}
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-medium">Comments (Optional)</label>
+                    {{ form.comments }}
+                    {% if form.comments.errors %}<div class="text-danger small mt-1">{{ form.comments.errors }}</div>{% endif %}
+                </div>
+                
+                <div class="d-flex gap-2 justify-content-end">
+                    <a href="{% url 'incubator:evaluation_list' startup.id %}" class="btn btn-outline-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Evaluation</button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}

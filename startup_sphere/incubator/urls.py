@@ -45,4 +45,13 @@ urlpatterns = [
     path('documents/upload/', views.document_upload, name='document_upload'),
     path('documents/<int:document_id>/edit/', views.document_edit, name='document_edit'),
     path('documents/<int:document_id>/delete/', views.document_delete, name='document_delete'),
+    
+    # Directory
+    path('directory/', views.startup_directory, name='startup_directory'),
+    path('directory/<int:startup_id>/', views.startup_public_profile, name='startup_public_profile'),
+    
+    # Evaluations
+    path('startups/<int:startup_id>/evaluations/', views.evaluation_list, name='evaluation_list'),
+    path('startups/<int:startup_id>/evaluations/create/', views.evaluation_create, name='evaluation_create'),
+    path('evaluations/<int:evaluation_id>/edit/', views.evaluation_edit, name='evaluation_edit'),
 ]

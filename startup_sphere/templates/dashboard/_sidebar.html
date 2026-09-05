@@ -63,7 +63,12 @@
             Analytics
         </a>
         
-        <a href="{% url 'dashboard:profile' %}" class="nav-link mt-2 {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
+        <a href="{% url 'incubator:startup_directory' %}" class="nav-link mt-2 {% if 'directory' in request.resolver_match.url_name %}active{% endif %}">
+            <i class="bi bi-globe"></i>
+            Startup Directory
+        </a>
+        
+        <a href="{% url 'dashboard:profile' %}" class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}">
             <i class="bi bi-gear"></i>
             Settings
         </a>

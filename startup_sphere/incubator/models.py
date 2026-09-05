@@ -112,8 +112,11 @@ class Activity(models.Model):
         ('team_member_removed', 'Team Member Removed'),
         ('team_member_updated', 'Team Member Updated'),
         ('document_uploaded', 'Document Uploaded'),
+        ('evaluation_received', 'Evaluation Received'),
         ('document_deleted', 'Document Deleted'),
         ('document_updated', 'Document Updated'),
+        ('evaluation_created', 'Evaluation Created'),
+        ('evaluation_updated', 'Evaluation Updated'),
     )
     startup = models.ForeignKey(Startup, on_delete=models.CASCADE, related_name='activities')
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='activities')
@@ -136,6 +139,7 @@ class Notification(models.Model):
         ('milestone_completed', 'Milestone Completed'),
         ('team_member_added', 'Team Member Added'),
         ('document_uploaded', 'Document Uploaded'),
+        ('evaluation_received', 'Evaluation Received'),
     )
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='notifications')
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='actor_notifications')
@@ -213,3 +217,39 @@ class Document(models.Model):
 
     def __str__(self):
         return f"{self.title} - {self.startup.name}"
+
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+class Evaluation(models.Model):
+    startup = models.ForeignKey(Startup, on_delete=models.CASCADE, related_name='evaluations')
+    evaluator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='evaluations_given')
+    
+    innovation_score = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    market_potential_score = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    business_model_score = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    team_score = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    execution_score = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(10)])
+    overall_score = models.FloatField(blank=True, null=True)
+    
+    comments = models.TextField(blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['startup', 'evaluator'], name='unique_evaluation')
+        ]
+
+    def save(self, *args, **kwargs):
+        self.overall_score = sum([
+            self.innovation_score, 
+            self.market_potential_score, 
+            self.business_model_score, 
+            self.team_score, 
+            self.execution_score
+        ]) / 5.0
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"Evaluation for {self.startup.name} by {self.evaluator.username}"
