@@ -101,8 +101,13 @@ def startup_edit(request):
 def idea_list(request):
     startup = get_active_startup(request.user)
     if not startup:
-        messages.info(request, "You must register a startup before managing ideas.")
-        return redirect('incubator:register_startup')
+        if request.user.role == 'founder':
+            messages.info(request, "You must register a startup before managing ideas.")
+            return redirect('incubator:register_startup')
+        else:
+            messages.error(request, "You are not associated with any startup.")
+            return redirect('dashboard:home')
+            
     ideas = startup.ideas.all().order_by('-updated_at')
         
     return render(request, 'incubator/idea_list.html', {'ideas': ideas, 'startup': startup})
@@ -767,7 +772,7 @@ def evaluation_create(request, startup_id):
                 title='New Startup Evaluation',
                 message=f'Your startup has received a new evaluation from {request.user.get_full_name() or request.user.username}.',
                 notification_type='evaluation_received',
-                link_url=f'/startups/{startup.id}/evaluations/'
+                link_url=reverse('incubator:evaluation_list', args=[startup.id])
             )
             
             messages.success(request, "Evaluation submitted successfully.")

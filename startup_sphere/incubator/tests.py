@@ -561,3 +561,25 @@ class Batch6BTests(TestCase):
             'execution_score': 10,
         })
         self.assertEqual(response.status_code, 403)
+
+    def test_team_member_dashboard_detection(self):
+        self.client.login(username='teammember', password='password123')
+        response = self.client.get(reverse('dashboard:home'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Incubation Status')
+        self.assertContains(response, self.startup1.get_incubation_status_display())
+        # Should not contain Founder actions
+        self.assertNotContains(response, 'Draft New Idea')
+        self.assertNotContains(response, 'Edit Startup Profile')
+
+    def test_team_member_idea_list_visibility(self):
+        # Create an idea first
+        from incubator.models import Idea
+        idea = Idea.objects.create(startup=self.startup1, creator=self.founder1, title='Test Idea', description='Desc')
+        
+        self.client.login(username='teammember', password='password123')
+        response = self.client.get(reverse('incubator:idea_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, idea.title)
+        # Should not contain Create Idea
+        self.assertNotContains(response, reverse('incubator:idea_create'))

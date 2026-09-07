@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from accounts.forms import UserProfileForm
 from incubator.models import Startup, Idea
+from incubator.views import get_active_startup
 
 @login_required
 def home(request):
@@ -47,8 +48,8 @@ def home(request):
     completed_milestones = 0
     activities = []
     
-    if hasattr(request.user, 'startup'):
-        startup = request.user.startup
+    startup = get_active_startup(request.user)
+    if startup:
         ideas_count = startup.ideas.count()
         submitted_ideas = startup.ideas.filter(status='submitted').count()
         under_review_ideas = startup.ideas.filter(status='under_review').count()

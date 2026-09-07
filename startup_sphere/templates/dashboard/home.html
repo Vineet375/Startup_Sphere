@@ -135,6 +135,7 @@
                 <div class="card p-4 h-100">
                     <h6 class="fw-bold mb-4">Quick Actions</h6>
                     
+                    {% if request.user == startup.founder %}
                     <a href="{% url 'incubator:idea_create' %}" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-main border rounded p-2 hover-bg-light">
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-lightbulb text-primary"></i>
@@ -143,10 +144,19 @@
                         <i class="bi bi-arrow-right text-muted"></i>
                     </a>
                     
+                    <a href="{% url 'incubator:startup_edit' %}" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-main border rounded p-2 hover-bg-light">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-rocket text-success"></i>
+                            <span class="small fw-medium">Edit Startup Profile</span>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted"></i>
+                    </a>
+                    {% endif %}
+                    
                     <a href="{% url 'incubator:startup_detail' %}" class="d-flex justify-content-between align-items-center mb-3 text-decoration-none text-main border rounded p-2 hover-bg-light">
                         <div class="d-flex align-items-center gap-2">
                             <i class="bi bi-rocket text-success"></i>
-                            <span class="small fw-medium">Manage Startup Profile</span>
+                            <span class="small fw-medium">View Startup Workspace</span>
                         </div>
                         <i class="bi bi-arrow-right text-muted"></i>
                     </a>

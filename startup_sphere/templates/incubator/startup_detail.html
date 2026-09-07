@@ -144,7 +144,9 @@
                                             </div>
                                         </div>
                                         <div>
+                                            {% if is_founder or is_mentor or is_admin %}
                                             <a href="{% url 'incubator:milestone_update' milestone.id %}" class="btn btn-sm btn-outline-secondary">Update</a>
+                                            {% endif %}
                                             {% if request.user == startup.mentor or request.user.role == 'admin' %}
                                                 <form action="{% url 'incubator:milestone_delete' milestone.id %}" method="post" class="d-inline" onsubmit="return confirm('Delete milestone?');">
                                                     {% csrf_token %}

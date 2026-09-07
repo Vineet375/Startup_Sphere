@@ -1,7 +1,7 @@
-from django.test import TestCase
+import os
 
-# Create your tests here.
-from django.test import TestCase
+file_path = 'core/tests.py'
+new_tests = """from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
@@ -23,3 +23,7 @@ class LandingPageTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, reverse('dashboard:home'))
         # It shouldn't point to register for the get started button. (Note: navbar might still have register depending on logic, but navbar usually hides it when auth'd)
+"""
+
+with open(file_path, 'a', encoding='utf-8') as f:
+    f.write(new_tests)
