@@ -1,14 +1,31 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
+import os
+
+file_path = 'dashboard/views.py'
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# Update imports
+old_imports = """from django.contrib import messages
+from accounts.forms import UserProfileForm
+from incubator.models import Startup, Idea
+from incubator.views import get_active_startup"""
+
+new_imports = """from django.contrib import messages
 from accounts.forms import UserProfileForm
 from incubator.models import Startup, Idea, Event, EventParticipation, CollaborationRequest, Notification, Activity, Document, Evaluation
 from incubator.views import get_active_startup
 from django.utils import timezone
 from core.models import User
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied"""
 
-@login_required
+content = content.replace(old_imports, new_imports)
+
+# Update home view to handle admin and add events/collaborations
+old_home = """@login_required
+def home(request):
+    if request.user.role == 'mentor':"""
+
+new_home = """@login_required
 def home(request):
     now = timezone.now()
     
@@ -34,64 +51,42 @@ def home(request):
         }
         return render(request, 'dashboard/admin_dashboard.html', context)
         
-    if request.user.role == 'mentor':
-        mentored_startups = request.user.mentored_startups.all()
-        # Find ideas for mentored startups that are submitted or under review
-        from django.db.models import Case, When, IntegerField
-        pending_ideas = Idea.objects.filter(
-            startup__in=mentored_startups, 
-            status__in=['submitted', 'under_review']
-        ).annotate(
-            priority=Case(
-                When(status='submitted', then=1),
-                When(status='under_review', then=2),
-                output_field=IntegerField(),
-            )
-        ).order_by('priority', 'submitted_at')
-        
-        pending_reviews = pending_ideas.count()
-        
-        # Calculate stats for each startup
-        for s in mentored_startups:
-            total_m = s.milestones.count()
-            completed_m = s.milestones.filter(status='completed').count()
-            s.progress_percentage = int((completed_m / total_m) * 100) if total_m > 0 else 0
-            s.pending_ideas_count = s.ideas.filter(status__in=['submitted', 'under_review']).count()
-        
-        context = {
+    if request.user.role == 'mentor':"""
+
+content = content.replace(old_home, new_home)
+
+# Add event/collab queries to mentor
+old_mentor_context = """        context = {
+            'mentored_startups': mentored_startups,
+            'pending_reviews': pending_reviews,
+            'pending_ideas': pending_ideas,
+        }"""
+
+new_mentor_context = """        context = {
             'mentored_startups': mentored_startups,
             'pending_reviews': pending_reviews,
             'pending_ideas': pending_ideas,
             'upcoming_events': Event.objects.filter(start_datetime__gte=now).order_by('start_datetime')[:3],
             'my_events': EventParticipation.objects.filter(participant=request.user, status='registered', event__start_datetime__gte=now).order_by('event__start_datetime')[:3],
             'pending_collabs': CollaborationRequest.objects.filter(recipient=request.user, status='pending').order_by('-created_at')[:3]
-        }
-        return render(request, 'dashboard/mentor_dashboard.html', context)
-        
-    startup = None
-    ideas_count = 0
-    submitted_ideas = 0
-    under_review_ideas = 0
-    team_members = 1 # Just the founder for now
-    progress_percentage = 0
-    total_milestones = 0
-    completed_milestones = 0
-    activities = []
-    
-    startup = get_active_startup(request.user)
-    if startup:
-        ideas_count = startup.ideas.count()
-        submitted_ideas = startup.ideas.filter(status='submitted').count()
-        under_review_ideas = startup.ideas.filter(status='under_review').count()
-        
-        total_milestones = startup.milestones.count()
-        completed_milestones = startup.milestones.filter(status='completed').count()
-        if total_milestones > 0:
-            progress_percentage = int((completed_milestones / total_milestones) * 100)
-            
-        activities = startup.activities.all().order_by('-created_at')[:5]
-        
-    my_events = EventParticipation.objects.filter(participant=request.user, status='registered', event__start_datetime__gte=now).order_by('event__start_datetime')[:3]
+        }"""
+
+content = content.replace(old_mentor_context, new_mentor_context)
+
+# Add event/collab queries to founder
+old_founder_context = """    context = {
+        'startup': startup,
+        'ideas_count': ideas_count,
+        'submitted_ideas': submitted_ideas,
+        'under_review_ideas': under_review_ideas,
+        'team_members': team_members,
+        'progress_percentage': progress_percentage,
+        'total_milestones': total_milestones,
+        'completed_milestones': completed_milestones,
+        'activities': activities,
+    }"""
+
+new_founder_context = """    my_events = EventParticipation.objects.filter(participant=request.user, status='registered', event__start_datetime__gte=now).order_by('event__start_datetime')[:3]
     upcoming_events = Event.objects.filter(start_datetime__gte=now).order_by('start_datetime')[:3]
     
     pending_collabs = []
@@ -114,27 +109,12 @@ def home(request):
         'my_events': my_events,
         'pending_collabs': pending_collabs,
         'sent_collabs': sent_collabs
-    }
-    return render(request, 'dashboard/home.html', context)
+    }"""
 
-@login_required
-def profile_view(request):
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Your profile has been updated successfully!')
-            return redirect('dashboard:profile')
-    else:
-        form = UserProfileForm(instance=request.user)
-    
-    return render(request, 'dashboard/profile.html', {'form': form})
+content = content.replace(old_founder_context, new_founder_context)
 
-@login_required
-def coming_soon_view(request, feature='feature'):
-    feature_name = feature.replace('-', ' ').title()
-    return render(request, 'dashboard/coming_soon.html', {'feature_name': feature_name, 'feature_slug': feature})
-
+# Now define all the admin views
+admin_views = """
 
 # ----------------- ADMIN VIEWS -----------------
 
@@ -179,3 +159,9 @@ def admin_activities(request):
         raise PermissionDenied
     activities = Activity.objects.all().order_by('-created_at')[:200]
     return render(request, 'dashboard/admin_activities.html', {'activities': activities})
+"""
+
+content += admin_views
+
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(content)

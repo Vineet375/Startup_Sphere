@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard | StartupSphere{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4" style="overflow-y: auto;">
+        <h4 class="fw-bold mb-4">Platform Admin Dashboard</h4>
+        
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card p-3 h-100 shadow-sm border-0 bg-primary text-white">
+                    <h6 class="fw-bold mb-2">Users</h6>
+                    <h2 class="mb-0">{{ total_users }}</h2>
+                    <small>{{ founders_count }} Founders | {{ mentors_count }} Mentors</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 h-100 shadow-sm border-0 bg-success text-white">
+                    <h6 class="fw-bold mb-2">Startups</h6>
+                    <h2 class="mb-0">{{ total_startups }}</h2>
+                    <small>{{ active_startups }} Active/Graduated</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 h-100 shadow-sm border-0 bg-warning text-dark">
+                    <h6 class="fw-bold mb-2">Ideas</h6>
+                    <h2 class="mb-0">{{ total_ideas }}</h2>
+                    <small>{{ pending_ideas }} Pending Review</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card p-3 h-100 shadow-sm border-0 bg-info text-dark">
+                    <h6 class="fw-bold mb-2">Events</h6>
+                    <h2 class="mb-0">{{ total_events }}</h2>
+                    <small>{{ upcoming_events }} Upcoming</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card p-4 border-0 shadow-sm h-100">
+                    <h6 class="fw-bold mb-3">Recent Startups</h6>
+                    <div class="list-group list-group-flush">
+                        {% for s in recent_startups %}
+                        <a href="{% url 'incubator:startup_detail_id' s.id %}" class="list-group-item list-group-item-action px-0">
+                            <strong>{{ s.name }}</strong> <span class="badge bg-secondary float-end">{{ s.get_incubation_status_display }}</span>
+                        </a>
+                        {% empty %}
+                        <p class="text-muted small">No startups registered yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-4 border-0 shadow-sm h-100">
+                    <h6 class="fw-bold mb-3">Other KPIs</h6>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Total Collaborations
+                            <span class="badge bg-primary rounded-pill">{{ total_collabs }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Pending Collaborations
+                            <span class="badge bg-warning rounded-pill">{{ pending_collabs }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Total Evaluations
+                            <span class="badge bg-success rounded-pill">{{ total_evals }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            Total Documents
+                            <span class="badge bg-secondary rounded-pill">{{ total_docs }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock layout %}

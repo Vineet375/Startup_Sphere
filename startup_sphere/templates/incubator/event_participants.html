@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block title %}Manage Participants - {{ event.title }} | StartupSphere{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4" style="overflow-y: auto;">
+        <div class="mb-3">
+            <a href="{% url 'incubator:event_detail' event.id %}" class="text-decoration-none text-muted">
+                <i class="bi bi-arrow-left me-1"></i> Back to Event Details
+            </a>
+        </div>
+        <h4 class="fw-bold mb-4">Participants: {{ event.title }}</h4>
+        
+        <div class="card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">User</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Registered At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in participants %}
+                        <tr>
+                            <td class="ps-4 fw-medium">{{ p.participant.get_full_name|default:p.participant.username }}</td>
+                            <td><span class="badge bg-secondary">{{ p.participant.get_role_display }}</span></td>
+                            <td>
+                                {% if p.status == 'registered' %}
+                                <span class="badge bg-primary bg-opacity-10 text-primary">Registered</span>
+                                {% elif p.status == 'attended' %}
+                                <span class="badge bg-success bg-opacity-10 text-success">Attended</span>
+                                {% else %}
+                                <span class="badge bg-danger bg-opacity-10 text-danger">Cancelled</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-muted small">{{ p.registered_at|date:"M d, Y H:i" }}</td>
+                            <td>
+                                {% if p.status == 'registered' %}
+                                <form action="{% url 'incubator:event_mark_attendance' event.id p.id %}" method="post" class="m-0">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-success">Mark Attended</button>
+                                </form>
+                                {% elif p.status == 'attended' %}
+                                <span class="text-muted small">Attended at {{ p.attended_at|date:"H:i" }}</span>
+                                {% else %}
+                                -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center py-4 text-muted">No participants found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

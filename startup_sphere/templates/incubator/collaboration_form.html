@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Send Collaboration Request | StartupSphere{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card p-4 border-0 shadow-sm">
+                    <h5 class="fw-bold mb-3">Send Request to {{ recipient.username }}</h5>
+                    <p class="text-muted small mb-4">They will be notified of your request and can choose to accept or decline.</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Request Type</label>
+                            {{ form.request_type }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Title</label>
+                            {{ form.title }}
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-medium">Message</label>
+                            {{ form.message }}
+                            <div class="form-text">Explain why you want to collaborate and what you're looking for.</div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4 fw-medium">Send Request</button>
+                            <a href="{% url 'incubator:collaboration_directory' %}" class="btn btn-light border">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block title %}My Collaboration Requests | StartupSphere{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4" style="overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Collaboration Requests</h4>
+            <a href="{% url 'incubator:collaboration_directory' %}" class="btn btn-primary fw-medium">Find Collaborators</a>
+        </div>
+        
+        <ul class="nav nav-tabs mb-4" id="collabTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#received">Received Requests</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#sent">Sent Requests</button>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="received">
+                <div class="row g-4">
+                    {% for r in received_requests %}
+                    <div class="col-md-6">
+                        <div class="card p-3 border hover-shadow transition h-100">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="badge bg-primary bg-opacity-10 text-primary">{{ r.get_request_type_display }}</span>
+                                {% if r.status == 'pending' %}<span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>
+                                {% elif r.status == 'accepted' %}<span class="badge bg-success bg-opacity-10 text-success">Accepted</span>
+                                {% elif r.status == 'rejected' %}<span class="badge bg-danger bg-opacity-10 text-danger">Rejected</span>
+                                {% else %}<span class="badge bg-secondary bg-opacity-10 text-secondary">Cancelled</span>{% endif %}
+                            </div>
+                            <h6 class="fw-bold mb-1">{{ r.title }}</h6>
+                            <p class="text-muted small mb-3">From: {{ r.requester.username }}</p>
+                            <a href="{% url 'incubator:collaboration_detail' r.id %}" class="btn btn-sm btn-outline-primary mt-auto">View Details</a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted mb-0">No received requests.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="tab-pane fade" id="sent">
+                <div class="row g-4">
+                    {% for r in sent_requests %}
+                    <div class="col-md-6">
+                        <div class="card p-3 border hover-shadow transition h-100">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="badge bg-primary bg-opacity-10 text-primary">{{ r.get_request_type_display }}</span>
+                                {% if r.status == 'pending' %}<span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>
+                                {% elif r.status == 'accepted' %}<span class="badge bg-success bg-opacity-10 text-success">Accepted</span>
+                                {% elif r.status == 'rejected' %}<span class="badge bg-danger bg-opacity-10 text-danger">Rejected</span>
+                                {% else %}<span class="badge bg-secondary bg-opacity-10 text-secondary">Cancelled</span>{% endif %}
+                            </div>
+                            <h6 class="fw-bold mb-1">{{ r.title }}</h6>
+                            <p class="text-muted small mb-3">To: {{ r.recipient.username }}</p>
+                            <a href="{% url 'incubator:collaboration_detail' r.id %}" class="btn btn-sm btn-outline-secondary mt-auto">View Details</a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <p class="text-muted mb-0">No sent requests.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
