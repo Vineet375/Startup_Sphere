@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Apply for Funding{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card p-4 border-0 shadow-sm">
+                    <h5 class="fw-bold mb-2">Apply for Funding</h5>
+                    <p class="text-muted small mb-4">Round: {{ round.round_name }} • Startup: {{ round.startup.name }}</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Requested Amount ($)</label>
+                            {{ form.requested_amount }}
+                            {% if form.requested_amount.errors %}<div class="text-danger small mt-1">{{ form.requested_amount.errors }}</div>{% endif %}
+                            <div class="form-text">Minimum allowed for this round: ${{ round.minimum_amount }}</div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-medium">Message to Founder</label>
+                            {{ form.message }}
+                            {% if form.message.errors %}<div class="text-danger small mt-1">{{ form.message.errors }}</div>{% endif %}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4 fw-medium">Submit Application</button>
+                            <a href="{% url 'incubator:funding_round_detail' round.id %}" class="btn btn-light border">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

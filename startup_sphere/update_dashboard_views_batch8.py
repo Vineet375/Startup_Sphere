@@ -1,4 +1,25 @@
-from django.shortcuts import render, redirect
+import os
+
+file_path = 'dashboard/views.py'
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
+
+# I will replace the entire home view to correctly handle all roles and inject the required data.
+# And add necessary imports.
+
+new_imports = """
+from incubator.models import Startup, Idea, Event, EventParticipation, CollaborationRequest, Notification, Activity, Document, Evaluation
+from incubator.models import InvestorProfile, FundingRound, FundingApplication, InvestorMeeting, JobPosting, JobApplication, Interview
+from core.models import User
+"""
+
+# We'll just replace the entire content for home view
+old_home_def = """@login_required
+def home(request):"""
+
+# wait, it's safer to just rewrite dashboard/views.py entirely based on what I know.
+
+new_dashboard_views = """from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from accounts.forms import UserProfileForm
@@ -243,3 +264,7 @@ def admin_activities(request):
     activities = Activity.objects.all().order_by('-created_at')[:200]
     return render(request, 'dashboard/admin_activities.html', {'activities': activities})
 
+"""
+
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(new_dashboard_views)

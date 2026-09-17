@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% block title %}Application Details{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+        <div class="mb-3">
+            <a href="{% url 'incubator:job_application_list' %}" class="text-decoration-none text-muted">
+                <i class="bi bi-arrow-left me-1"></i> Back to Applications
+            </a>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-8">
+                <div class="card p-4 border-0 shadow-sm mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h4 class="fw-bold mb-1">Application for {{ app.job.title }}</h4>
+                            <p class="text-muted mb-0">by {{ app.applicant.get_full_name|default:app.applicant.username }}</p>
+                        </div>
+                        <div>
+                            <span class="badge bg-primary px-3 py-2 fs-6 rounded-pill">{{ app.get_status_display }}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-light p-3 rounded mb-4 d-flex gap-3">
+                        <a href="{{ app.resume.url }}" class="btn btn-outline-primary" target="_blank"><i class="bi bi-file-earmark-pdf me-1"></i> View Resume</a>
+                        {% if app.portfolio_url %}
+                        <a href="{{ app.portfolio_url }}" class="btn btn-outline-secondary" target="_blank"><i class="bi bi-link-45deg me-1"></i> Portfolio</a>
+                        {% endif %}
+                    </div>
+                    
+                    {% if app.cover_letter %}
+                    <h6 class="fw-bold mb-2">Cover Letter</h6>
+                    <div class="p-3 bg-light rounded text-muted mb-4" style="white-space: pre-wrap;">{{ app.cover_letter }}</div>
+                    {% endif %}
+                    
+                    {% if is_owner %}
+                    <div class="border-top pt-4 mt-4">
+                        <h6 class="fw-bold mb-3">Update Application Status</h6>
+                        <form method="post" class="d-flex flex-wrap gap-2">
+                            {% csrf_token %}
+                            <button type="submit" name="status" value="reviewing" class="btn btn-outline-secondary btn-sm">Mark Reviewing</button>
+                            <button type="submit" name="status" value="shortlisted" class="btn btn-outline-primary btn-sm">Shortlist</button>
+                            <button type="submit" name="status" value="interview" class="btn btn-outline-info btn-sm">Mark Interview</button>
+                            <button type="submit" name="status" value="hired" class="btn btn-success btn-sm">Hire Candidate</button>
+                            <button type="submit" name="status" value="rejected" class="btn btn-danger btn-sm">Reject</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card p-3 border-0 shadow-sm mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0">Interviews</h6>
+                        {% if is_owner %}
+                        <a href="{% url 'incubator:interview_create' app.id %}" class="btn btn-sm btn-primary">Schedule</a>
+                        {% endif %}
+                    </div>
+                    
+                    <ul class="list-group list-group-flush">
+                        {% for interview in interviews %}
+                        <li class="list-group-item px-0 border-bottom">
+                            <div class="d-flex justify-content-between mb-1">
+                                <span class="fw-medium text-truncate">{{ interview.scheduled_at|date:"M d, Y H:i" }}</span>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary">{{ interview.get_status_display }}</span>
+                            </div>
+                            <small class="text-muted d-block">{{ interview.get_meeting_type_display }} • {{ interview.duration }}m</small>
+                            {% if interview.meeting_link %}
+                            <a href="{{ interview.meeting_link }}" target="_blank" class="small mt-1 d-inline-block">Join Link</a>
+                            {% endif %}
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item px-0 text-muted small border-0">No interviews scheduled.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

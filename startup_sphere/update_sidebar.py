@@ -1,25 +1,167 @@
 import os
 
-file_path = 'templates/dashboard/_sidebar.html'
-with open(file_path, 'r', encoding='utf-8') as f:
-    content = f.read()
+sidebar_path = 'templates/dashboard/_sidebar.html'
+with open(sidebar_path, 'r', encoding='utf-8') as f:
+    sidebar = f.read()
 
-old_sidebar = """<div class="sidebar d-none d-lg-block px-3" style="width: 250px; flex-shrink: 0;">
-    <div class="nav flex-column mb-auto">"""
+# Instead of blindly replacing, I will completely rewrite the sidebar to be robust.
 
-new_sidebar = """<div class="offcanvas-lg offcanvas-start sidebar border-end" tabindex="-1" id="sidebarMenu" aria-labelledby="sidebarMenuLabel" style="width: 250px; flex-shrink: 0; background-color: var(--bg-surface);">
-    <div class="offcanvas-header d-lg-none border-bottom">
-        <h5 class="offcanvas-title" id="sidebarMenuLabel">Menu</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu" aria-label="Close"></button>
+new_sidebar = """<div class="bg-white border-end d-flex flex-column" style="width: 280px; min-height: calc(100vh - 65px);" id="sidebar">
+    <div class="p-4 flex-grow-1 overflow-y-auto">
+        <ul class="nav flex-column gap-2 mb-4">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'dashboard:home' %}">
+                    <i class="bi bi-grid me-2"></i> Dashboard
+                </a>
+            </li>
+            
+            {% if request.user.role == 'founder' or request.user.role == 'team_member' %}
+            <li class="nav-item">
+                <a class="nav-link {% if 'startup' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:startup_detail' 0 %}">
+                    <i class="bi bi-rocket me-2"></i> My Startup
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'ideas' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:idea_list' %}">
+                    <i class="bi bi-lightbulb me-2"></i> Ideas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'team' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:team_list' %}">
+                    <i class="bi bi-people me-2"></i> Team
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'documents' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:document_list' %}">
+                    <i class="bi bi-folder me-2"></i> Documents
+                </a>
+            </li>
+            
+            {% if request.user.role == 'founder' %}
+            <li class="nav-item mt-3 mb-1">
+                <small class="text-muted fw-bold text-uppercase px-3">Growth & Funding</small>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'funding' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:funding_round_list' %}">
+                    <i class="bi bi-cash-stack me-2"></i> Funding Rounds
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'investors' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:investor_directory' %}">
+                    <i class="bi bi-search me-2"></i> Find Investors
+                </a>
+            </li>
+            <li class="nav-item mt-3 mb-1">
+                <small class="text-muted fw-bold text-uppercase px-3">Hiring & Talent</small>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'jobs' in request.path and not 'directory' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:job_posting_list' %}">
+                    <i class="bi bi-briefcase me-2"></i> Job Postings
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'applications' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:job_application_list' %}">
+                    <i class="bi bi-file-earmark-person me-2"></i> Job Applications
+                </a>
+            </li>
+            {% endif %}
+            
+            {% endif %}
+
+            {% if request.user.role == 'investor' %}
+            <li class="nav-item mt-3 mb-1">
+                <small class="text-muted fw-bold text-uppercase px-3">Investing</small>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'investor/profile' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:investor_profile_edit' %}">
+                    <i class="bi bi-person-badge me-2"></i> Investor Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'funding' in request.path and not 'applications' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:funding_round_list' %}">
+                    <i class="bi bi-compass me-2"></i> Opportunities
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'applications' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:funding_application_list' %}">
+                    <i class="bi bi-send-check me-2"></i> My Applications
+                </a>
+            </li>
+            {% endif %}
+            
+            {% if request.user.role == 'applicant' %}
+            <li class="nav-item mt-3 mb-1">
+                <small class="text-muted fw-bold text-uppercase px-3">Career</small>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'jobs/directory' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:job_directory' %}">
+                    <i class="bi bi-search me-2"></i> Job Search
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'applications' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:job_application_list' %}">
+                    <i class="bi bi-file-earmark-person me-2"></i> My Applications
+                </a>
+            </li>
+            {% endif %}
+
+            <li class="nav-item mt-3 mb-1">
+                <small class="text-muted fw-bold text-uppercase px-3">Ecosystem</small>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'directory' in request.path and not 'jobs' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:startup_directory' %}">
+                    <i class="bi bi-building me-2"></i> Startups
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'events' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:event_list' %}">
+                    <i class="bi bi-calendar-event me-2"></i> Events
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'collaborations' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'incubator:collaboration_directory' %}">
+                    <i class="bi bi-chat-left-dots me-2"></i> Network
+                </a>
+            </li>
+
+            {% if request.user.role == 'admin' %}
+            <li class="nav-item mt-3 mb-1">
+                <small class="text-muted fw-bold text-uppercase px-3">Platform Admin</small>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'admin/users' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'dashboard:admin_users' %}">
+                    <i class="bi bi-people me-2"></i> Users
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'admin/startups' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'dashboard:admin_startups' %}">
+                    <i class="bi bi-rocket me-2"></i> Startups
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'admin/ideas' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'dashboard:admin_ideas' %}">
+                    <i class="bi bi-lightbulb me-2"></i> Ideas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'admin/events' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'dashboard:admin_events' %}">
+                    <i class="bi bi-calendar-event me-2"></i> Events
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'admin/collaborations' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'dashboard:admin_collaborations' %}">
+                    <i class="bi bi-chat-left-dots me-2"></i> Collaborations
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'admin/activities' in request.path %}active fw-bold text-primary bg-primary bg-opacity-10 rounded{% else %}text-dark{% endif %}" href="{% url 'dashboard:admin_activities' %}">
+                    <i class="bi bi-activity me-2"></i> Audit Log
+                </a>
+            </li>
+            {% endif %}
+        </ul>
     </div>
-    <div class="offcanvas-body d-flex flex-column p-3 pt-lg-3 overflow-y-auto">
-        <div class="nav flex-column mb-auto w-100">"""
-
-if old_sidebar in content:
-    content = content.replace(old_sidebar, new_sidebar)
-
-# Fix the closing div for offcanvas-body
-content = content + "\n    </div>"
-
-with open(file_path, 'w', encoding='utf-8') as f:
-    f.write(content)
+</div>
+"""
+with open(sidebar_path, 'w', encoding='utf-8') as f:
+    f.write(new_sidebar)

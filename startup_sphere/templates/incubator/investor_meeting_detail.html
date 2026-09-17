@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Meeting Details{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+        <div class="mb-3">
+            <a href="{% url 'incubator:funding_application_detail' meeting.funding_application.id %}" class="text-decoration-none text-muted">
+                <i class="bi bi-arrow-left me-1"></i> Back to Application
+            </a>
+        </div>
+        
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card p-4 border-0 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold mb-0">Meeting Details</h4>
+                        <div>
+                            {% if meeting.status == 'scheduled' %}<span class="badge bg-primary px-3 py-2 rounded-pill">Scheduled</span>
+                            {% elif meeting.status == 'completed' %}<span class="badge bg-success px-3 py-2 rounded-pill">Completed</span>
+                            {% else %}<span class="badge bg-secondary px-3 py-2 rounded-pill">{{ meeting.get_status_display }}</span>{% endif %}
+                        </div>
+                    </div>
+                    
+                    <ul class="list-unstyled mb-4 border-bottom pb-4">
+                        <li class="mb-2"><span class="text-muted d-inline-block" style="width: 120px;">Time</span><span class="fw-medium">{{ meeting.scheduled_at|date:"M d, Y H:i" }}</span></li>
+                        <li class="mb-2"><span class="text-muted d-inline-block" style="width: 120px;">Duration</span><span class="fw-medium">{{ meeting.duration }} minutes</span></li>
+                        <li class="mb-2"><span class="text-muted d-inline-block" style="width: 120px;">Type</span><span class="fw-medium">{{ meeting.get_meeting_type_display }}</span></li>
+                        {% if meeting.meeting_link %}
+                        <li class="mb-2"><span class="text-muted d-inline-block" style="width: 120px;">Link</span><a href="{{ meeting.meeting_link }}" target="_blank" class="fw-medium">Join Meeting <i class="bi bi-box-arrow-up-right ms-1"></i></a></li>
+                        {% endif %}
+                        {% if meeting.location %}
+                        <li class="mb-2"><span class="text-muted d-inline-block" style="width: 120px;">Location</span><span class="fw-medium">{{ meeting.location }}</span></li>
+                        {% endif %}
+                    </ul>
+                    
+                    {% if meeting.agenda %}
+                    <h6 class="fw-bold mb-2">Agenda</h6>
+                    <p class="text-muted mb-4">{{ meeting.agenda }}</p>
+                    {% endif %}
+                    
+                    {% if meeting.notes %}
+                    <h6 class="fw-bold mb-2">Notes</h6>
+                    <p class="text-muted mb-4">{{ meeting.notes }}</p>
+                    {% endif %}
+                    
+                    {% if is_owner and meeting.status == 'scheduled' %}
+                    <div class="d-flex gap-2 mt-2">
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" name="action" value="completed" class="btn btn-success">Mark Completed</button>
+                            <button type="submit" name="action" value="cancelled" class="btn btn-outline-danger">Cancel Meeting</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

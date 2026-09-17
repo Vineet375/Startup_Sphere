@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Investor Dashboard{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Welcome, {{ request.user.username }}</h4>
+            {% if not profile_exists %}
+            <a href="{% url 'incubator:investor_profile_edit' %}" class="btn btn-primary fw-medium">Complete Your Profile</a>
+            {% else %}
+            <a href="{% url 'incubator:investor_directory' %}" class="btn btn-outline-primary fw-medium">Find Startups</a>
+            {% endif %}
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0">Open Funding Opportunities</h6>
+                        <a href="{% url 'incubator:funding_round_list' %}" class="small text-decoration-none">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            {% for round in open_rounds %}
+                            <a href="{% url 'incubator:funding_round_detail' round.id %}" class="list-group-item list-group-item-action px-0 border-bottom">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="mb-0 fw-bold">{{ round.round_name }}</h6>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">{{ round.get_round_type_display }}</span>
+                                </div>
+                                <p class="text-muted small mb-0">{{ round.startup.name }} • Target: ${{ round.target_amount }}</p>
+                            </a>
+                            {% empty %}
+                            <p class="text-muted small py-3 mb-0">No open funding rounds currently available.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                        <h6 class="fw-bold mb-0">My Applications</h6>
+                        <a href="{% url 'incubator:funding_application_list' %}" class="small text-decoration-none">View All</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            {% for app in my_apps %}
+                            <a href="{% url 'incubator:funding_application_detail' app.id %}" class="list-group-item list-group-item-action px-0 border-bottom">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <h6 class="mb-0 fw-bold">{{ app.funding_round.startup.name }}</h6>
+                                    {% if app.status == 'pending' %}<span class="badge bg-warning text-dark">Pending</span>
+                                    {% elif app.status == 'accepted' %}<span class="badge bg-success">Accepted</span>
+                                    {% else %}<span class="badge bg-secondary">{{ app.get_status_display }}</span>{% endif %}
+                                </div>
+                                <p class="text-muted small mb-0">Requested: ${{ app.requested_amount }} • {{ app.created_at|date:"M d, Y" }}</p>
+                            </a>
+                            {% empty %}
+                            <p class="text-muted small py-3 mb-0">You haven't applied to any rounds yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                        <h6 class="fw-bold mb-0">Upcoming Meetings</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group list-group-flush">
+                            {% for meeting in upcoming_meetings %}
+                            <a href="{% url 'incubator:investor_meeting_detail' meeting.id %}" class="list-group-item list-group-item-action px-0 border-bottom">
+                                <h6 class="mb-1 text-truncate fw-medium">{{ meeting.funding_application.funding_round.startup.name }}</h6>
+                                <small class="text-muted d-block"><i class="bi bi-clock me-1"></i> {{ meeting.scheduled_at|date:"M d, Y H:i" }}</small>
+                            </a>
+                            {% empty %}
+                            <p class="text-muted small py-2 mb-0">No upcoming meetings.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

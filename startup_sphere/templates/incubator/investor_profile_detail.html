@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Investor Profile - {{ profile.user.get_full_name }}{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+        <div class="mb-3">
+            <a href="{% url 'incubator:investor_directory' %}" class="text-decoration-none text-muted">
+                <i class="bi bi-arrow-left me-1"></i> Back to Directory
+            </a>
+        </div>
+        <div class="card p-4 border-0 shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h3 class="fw-bold mb-1">{{ profile.user.get_full_name|default:profile.user.username }}</h3>
+                    <p class="text-muted mb-0">{{ profile.organization_name|default:"Independent Investor" }} • <span class="badge bg-primary bg-opacity-10 text-primary">{{ profile.get_investor_type_display }}</span></p>
+                </div>
+                {% if request.user == profile.user %}
+                <a href="{% url 'incubator:investor_profile_edit' %}" class="btn btn-outline-primary">Edit Profile</a>
+                {% endif %}
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <h6 class="fw-bold text-uppercase text-muted mb-2">Bio</h6>
+                    <p>{{ profile.bio|default:"No bio provided." }}</p>
+                    
+                    <h6 class="fw-bold text-uppercase text-muted mt-4 mb-2">Investment Focus</h6>
+                    <p>{{ profile.investment_focus|default:"Not specified." }}</p>
+                    
+                    <h6 class="fw-bold text-uppercase text-muted mt-4 mb-2">Preferred Industries</h6>
+                    <p>{{ profile.preferred_industries|default:"Not specified." }}</p>
+                    
+                    <h6 class="fw-bold text-uppercase text-muted mt-4 mb-2">Preferred Startup Stages</h6>
+                    <p>{{ profile.preferred_startup_stages|default:"Not specified." }}</p>
+                </div>
+                <div class="col-md-4">
+                    <div class="bg-light p-3 rounded">
+                        <h6 class="fw-bold mb-3">Details</h6>
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><i class="bi bi-geo-alt me-2 text-muted"></i> {{ profile.location|default:"Unknown" }}</li>
+                            {% if profile.website %}
+                            <li class="mb-2"><i class="bi bi-globe me-2 text-muted"></i> <a href="{{ profile.website }}" target="_blank">Website</a></li>
+                            {% endif %}
+                            {% if profile.linkedin_url %}
+                            <li class="mb-2"><i class="bi bi-linkedin me-2 text-muted"></i> <a href="{{ profile.linkedin_url }}" target="_blank">LinkedIn</a></li>
+                            {% endif %}
+                            <li class="mb-2 mt-3 text-muted small text-uppercase">Investment Range</li>
+                            <li class="fw-medium">${{ profile.min_investment|default:"0" }} - ${{ profile.max_investment|default:"Unlimited" }}</li>
+                        </ul>
+                        {% if request.user.role != 'investor' and request.user != profile.user %}
+                        <a href="{% url 'incubator:collaboration_request_create' profile.user.id %}" class="btn btn-primary w-100 mt-4">Contact Investor</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

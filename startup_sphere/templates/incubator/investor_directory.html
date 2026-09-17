@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Investor Directory{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Investor Directory</h4>
+        </div>
+        
+        <div class="card p-3 mb-4 border-0 shadow-sm">
+            <form method="get" class="row g-2 align-items-center">
+                <div class="col-md-6">
+                    <input type="text" name="q" class="form-control" placeholder="Search by name, org, or focus..." value="{{ query }}">
+                </div>
+                <div class="col-md-4">
+                    <select name="investor_type" class="form-select">
+                        <option value="">All Types</option>
+                        <option value="angel" {% if investor_type == 'angel' %}selected{% endif %}>Angel Investor</option>
+                        <option value="vc" {% if investor_type == 'vc' %}selected{% endif %}>Venture Capital</option>
+                        <option value="corporate" {% if investor_type == 'corporate' %}selected{% endif %}>Corporate Investor</option>
+                        <option value="seed" {% if investor_type == 'seed' %}selected{% endif %}>Seed Fund</option>
+                        <option value="accelerator" {% if investor_type == 'accelerator' %}selected{% endif %}>Accelerator</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row g-4">
+            {% for p in profiles %}
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-3 hover-shadow transition">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="fw-bold mb-0">{{ p.user.get_full_name|default:p.user.username }}</h6>
+                        <span class="badge bg-primary bg-opacity-10 text-primary">{{ p.get_investor_type_display }}</span>
+                    </div>
+                    <p class="text-muted small mb-3">{{ p.organization_name|default:"Independent" }}</p>
+                    <p class="small text-truncate mb-3">{{ p.investment_focus|default:"Focus not specified." }}</p>
+                    <a href="{% url 'incubator:investor_profile_detail' p.user.id %}" class="btn btn-sm btn-outline-primary mt-auto">View Profile</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted mb-0">No investors found.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</div>
+{% endblock %}

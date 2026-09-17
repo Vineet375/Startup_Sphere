@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% block title %}Job Directory{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Find Jobs</h4>
+        </div>
+        
+        <div class="card p-3 mb-4 border-0 shadow-sm">
+            <form method="get" class="row g-2 align-items-center">
+                <div class="col-md-5">
+                    <input type="text" name="q" class="form-control" placeholder="Search by title, description, or startup..." value="{{ query }}">
+                </div>
+                <div class="col-md-3">
+                    <select name="employment_type" class="form-select">
+                        <option value="">Any Employment Type</option>
+                        <option value="full_time" {% if emp_type == 'full_time' %}selected{% endif %}>Full Time</option>
+                        <option value="part_time" {% if emp_type == 'part_time' %}selected{% endif %}>Part Time</option>
+                        <option value="internship" {% if emp_type == 'internship' %}selected{% endif %}>Internship</option>
+                        <option value="contract" {% if emp_type == 'contract' %}selected{% endif %}>Contract</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="experience_level" class="form-select">
+                        <option value="">Any Level</option>
+                        <option value="entry" {% if exp_level == 'entry' %}selected{% endif %}>Entry Level</option>
+                        <option value="junior" {% if exp_level == 'junior' %}selected{% endif %}>Junior</option>
+                        <option value="mid" {% if exp_level == 'mid' %}selected{% endif %}>Mid Level</option>
+                        <option value="senior" {% if exp_level == 'senior' %}selected{% endif %}>Senior</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row g-4">
+            {% for job in jobs %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm p-3 hover-shadow transition">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h6 class="fw-bold mb-0 text-truncate">{{ job.title }}</h6>
+                        <span class="badge bg-primary bg-opacity-10 text-primary">{{ job.get_employment_type_display }}</span>
+                    </div>
+                    <p class="text-muted small mb-3">{{ job.startup.name }}</p>
+                    <div class="d-flex gap-2 text-muted small mb-3">
+                        <span><i class="bi bi-geo-alt me-1"></i> {% if job.is_remote %}Remote{% else %}{{ job.location }}{% endif %}</span>
+                        <span><i class="bi bi-clock me-1"></i> {{ job.created_at|timesince }} ago</span>
+                    </div>
+                    <a href="{% url 'incubator:job_posting_detail' job.id %}" class="btn btn-sm btn-outline-primary mt-auto">View Details</a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-12 text-center py-5">
+                <p class="text-muted mb-0">No jobs found.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </main>
+</div>
+{% endblock %}

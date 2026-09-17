@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Apply for {{ job.title }}{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card p-4 border-0 shadow-sm">
+                    <h4 class="fw-bold mb-2">Apply for {{ job.title }}</h4>
+                    <p class="text-muted small mb-4">at {{ job.startup.name }}</p>
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Resume (PDF, DOCX)</label>
+                            {{ form.resume }}
+                            {% if form.resume.errors %}<div class="text-danger small mt-1">{{ form.resume.errors }}</div>{% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Cover Letter (Optional)</label>
+                            {{ form.cover_letter }}
+                            {% if form.cover_letter.errors %}<div class="text-danger small mt-1">{{ form.cover_letter.errors }}</div>{% endif %}
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-medium">Portfolio URL (Optional)</label>
+                            {{ form.portfolio_url }}
+                            {% if form.portfolio_url.errors %}<div class="text-danger small mt-1">{{ form.portfolio_url.errors }}</div>{% endif %}
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4 fw-medium">Submit Application</button>
+                            <a href="{% url 'incubator:job_posting_detail' job.id %}" class="btn btn-light border">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

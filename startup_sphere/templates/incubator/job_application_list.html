@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% block title %}Job Applications{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="fw-bold mb-0">Job Applications</h4>
+        </div>
+        
+        <div class="card border-0 shadow-sm p-3">
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Job Title</th>
+                            <th>Startup</th>
+                            <th>Applicant</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+                            <td class="fw-medium">{{ app.job.title }}</td>
+                            <td>{{ app.job.startup.name }}</td>
+                            <td>{{ app.applicant.get_full_name|default:app.applicant.username }}</td>
+                            <td>
+                                {% if app.status == 'submitted' %}<span class="badge bg-warning text-dark">Submitted</span>
+                                {% elif app.status == 'reviewing' %}<span class="badge bg-info">Reviewing</span>
+                                {% elif app.status == 'shortlisted' %}<span class="badge bg-primary">Shortlisted</span>
+                                {% elif app.status == 'interview' %}<span class="badge bg-primary">Interview</span>
+                                {% elif app.status == 'rejected' %}<span class="badge bg-danger">Rejected</span>
+                                {% elif app.status == 'hired' %}<span class="badge bg-success">Hired</span>
+                                {% else %}<span class="badge bg-secondary">{{ app.get_status_display }}</span>{% endif %}
+                            </td>
+                            <td class="text-muted small">{{ app.applied_at|date:"M d, Y" }}</td>
+                            <td><a href="{% url 'incubator:job_application_detail' app.id %}" class="btn btn-sm btn-outline-primary">View</a></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6" class="text-center text-muted py-5">No applications found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

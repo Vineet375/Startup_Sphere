@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% block title %}Application Details{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+        <div class="mb-3">
+            <a href="{% url 'incubator:funding_application_list' %}" class="text-decoration-none text-muted">
+                <i class="bi bi-arrow-left me-1"></i> Back to Applications
+            </a>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-8">
+                <div class="card p-4 border-0 shadow-sm mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h4 class="fw-bold mb-0">Application from {{ app.investor.username }}</h4>
+                        <div>
+                            {% if app.status == 'pending' %}<span class="badge bg-warning px-3 py-2 text-dark fs-6 rounded-pill">Pending</span>
+                            {% elif app.status == 'accepted' %}<span class="badge bg-success px-3 py-2 fs-6 rounded-pill">Accepted</span>
+                            {% elif app.status == 'rejected' %}<span class="badge bg-danger px-3 py-2 fs-6 rounded-pill">Rejected</span>
+                            {% else %}<span class="badge bg-secondary px-3 py-2 fs-6 rounded-pill">{{ app.get_status_display }}</span>{% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="bg-light p-3 rounded mb-4">
+                        <div class="row">
+                            <div class="col-md-6 border-end">
+                                <span class="text-muted d-block small">Funding Round</span>
+                                <a href="{% url 'incubator:funding_round_detail' app.funding_round.id %}" class="fw-medium text-decoration-none">{{ app.funding_round.round_name }}</a>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <span class="text-muted d-block small">Requested Amount</span>
+                                <span class="fw-bold fs-5 text-primary">${{ app.requested_amount }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h6 class="fw-bold mb-2">Message</h6>
+                    <div class="p-3 bg-light rounded text-muted mb-4" style="white-space: pre-wrap;">{{ app.message|default:"No message." }}</div>
+                    
+                    {% if is_owner and app.status == 'pending' or app.status == 'reviewing' %}
+                    <div class="border-top pt-4">
+                        <h6 class="fw-bold mb-3">Update Status</h6>
+                        <form method="post" class="d-flex gap-2">
+                            {% csrf_token %}
+                            <button type="submit" name="status" value="reviewing" class="btn btn-outline-warning">Mark Reviewing</button>
+                            <button type="submit" name="status" value="accepted" class="btn btn-success">Accept</button>
+                            <button type="submit" name="status" value="rejected" class="btn btn-danger">Reject</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    
+                    {% if is_investor and app.status == 'pending' %}
+                    <div class="border-top pt-4">
+                        <form action="{% url 'incubator:funding_application_withdraw' app.id %}" method="post">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Withdraw application?');">Withdraw Application</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card p-3 border-0 shadow-sm mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="fw-bold mb-0">Meetings</h6>
+                        {% if is_owner %}
+                        <a href="{% url 'incubator:investor_meeting_create' app.id %}" class="btn btn-sm btn-primary">Schedule</a>
+                        {% endif %}
+                    </div>
+                    
+                    <ul class="list-group list-group-flush">
+                        {% for meeting in meetings %}
+                        <a href="{% url 'incubator:investor_meeting_detail' meeting.id %}" class="list-group-item list-group-item-action px-0 border-bottom">
+                            <div class="d-flex justify-content-between">
+                                <span class="fw-medium text-truncate">{{ meeting.scheduled_at|date:"M d, Y H:i" }}</span>
+                                <span class="badge bg-secondary bg-opacity-10 text-secondary">{{ meeting.get_status_display }}</span>
+                            </div>
+                            <small class="text-muted">{{ meeting.get_meeting_type_display }} • {{ meeting.duration }}m</small>
+                        </a>
+                        {% empty %}
+                        <li class="list-group-item px-0 text-muted small border-0">No meetings scheduled.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

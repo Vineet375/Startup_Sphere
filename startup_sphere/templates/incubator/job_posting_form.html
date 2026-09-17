@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card p-4 border-0 shadow-sm">
+                    <h4 class="fw-bold mb-4">{{ title }}</h4>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            {% for field in form %}
+                            <div class="col-md-{% if field.name == 'is_remote' %}12{% else %}6{% endif %}">
+                                <label class="form-label fw-medium">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
+                                {% if field.errors %}<div class="text-danger small mt-1">{{ field.errors }}</div>{% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-4 d-flex gap-2">
+                            <button type="submit" class="btn btn-primary px-4 fw-medium">Save Job</button>
+                            <a href="{% url 'incubator:job_posting_list' %}" class="btn btn-light border">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}
