@@ -3,7 +3,7 @@
 {% block layout %}
 <div class="d-flex" style="min-height: calc(100vh - 65px);">
     {% include 'dashboard/_sidebar.html' %}
-    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+    <main class="flex-grow-1 p-4 bg-body" style="overflow-y: auto;">
         
         <div class="mb-3">
             <a href="{% if is_founder or is_assigned_mentor %}{% url 'incubator:startup_detail_id' startup.id %}{% else %}{% url 'incubator:startup_directory' %}{% endif %}" class="text-decoration-none text-muted">
@@ -40,9 +40,9 @@
             {% for eval in evaluations %}
             <div class="col">
                 <div class="card shadow-sm border-0">
-                    <div class="card-header bg-white border-bottom-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
+                    <div class="card-header bg-body border-bottom-0 pt-3 pb-0 d-flex justify-content-between align-items-center">
                         <div class="d-flex align-items-center">
-                            <div class="bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                            <div class="bg-body text-primary rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
                                 <i class="bi bi-clipboard-data"></i>
                             </div>
                             <div>
@@ -56,14 +56,14 @@
                     </div>
                     <div class="card-body">
                         <div class="row row-cols-2 row-cols-md-5 text-center mb-3 g-2">
-                            <div class="col"><div class="p-2 bg-light rounded"><small class="d-block text-muted">Innovation</small><strong class="fs-5">{{ eval.innovation_score }}</strong></div></div>
-                            <div class="col"><div class="p-2 bg-light rounded"><small class="d-block text-muted">Market</small><strong class="fs-5">{{ eval.market_potential_score }}</strong></div></div>
-                            <div class="col"><div class="p-2 bg-light rounded"><small class="d-block text-muted">Business</small><strong class="fs-5">{{ eval.business_model_score }}</strong></div></div>
-                            <div class="col"><div class="p-2 bg-light rounded"><small class="d-block text-muted">Team</small><strong class="fs-5">{{ eval.team_score }}</strong></div></div>
-                            <div class="col"><div class="p-2 bg-light rounded"><small class="d-block text-muted">Execution</small><strong class="fs-5">{{ eval.execution_score }}</strong></div></div>
+                            <div class="col"><div class="p-2 bg-body rounded"><small class="d-block text-muted">Innovation</small><strong class="fs-5">{{ eval.innovation_score }}</strong></div></div>
+                            <div class="col"><div class="p-2 bg-body rounded"><small class="d-block text-muted">Market</small><strong class="fs-5">{{ eval.market_potential_score }}</strong></div></div>
+                            <div class="col"><div class="p-2 bg-body rounded"><small class="d-block text-muted">Business</small><strong class="fs-5">{{ eval.business_model_score }}</strong></div></div>
+                            <div class="col"><div class="p-2 bg-body rounded"><small class="d-block text-muted">Team</small><strong class="fs-5">{{ eval.team_score }}</strong></div></div>
+                            <div class="col"><div class="p-2 bg-body rounded"><small class="d-block text-muted">Execution</small><strong class="fs-5">{{ eval.execution_score }}</strong></div></div>
                         </div>
                         {% if eval.comments %}
-                            <div class="bg-light p-3 rounded text-secondary fst-italic">
+                            <div class="bg-body p-3 rounded text-muted fst-italic">
                                 "{{ eval.comments }}"
                             </div>
                         {% endif %}

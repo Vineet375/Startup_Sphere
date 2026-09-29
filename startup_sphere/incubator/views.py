@@ -8,7 +8,7 @@ from .models import Startup, Idea, Feedback, Milestone, Activity, Notification
 from .forms import StartupForm, IdeaForm, FeedbackForm, MilestoneForm
 
 
-from .models import TeamMember, Document
+from .models import TeamMember, Document, DirectMessage
 from .forms import TeamMemberInviteForm, TeamMemberUpdateForm, DocumentForm
 
 def get_active_startup(user):
@@ -44,9 +44,30 @@ def startup_detail(request, startup_id=None):
         is_team = is_active_team_member(request.user, startup)
             
     milestones = startup.milestones.all().order_by('target_date')
+    
+    # Milestone stats
+    total = milestones.count()
+    completed = milestones.filter(status='completed').count()
+    milestone_stats = {
+        'total': total,
+        'pending': milestones.filter(status='pending').count(),
+        'in_progress': milestones.filter(status='in_progress').count(),
+        'completed': completed,
+        'percentage': int((completed / total * 100)) if total > 0 else 0
+    }
+    
+    # Visible ideas
+    visible_ideas = startup.ideas.all().order_by('-created_at')
+    
+    # Recent activity
+    recent_activity = startup.activities.all().order_by('-created_at')[:5]
+    
     return render(request, 'incubator/startup_detail.html', {
         'startup': startup, 
         'milestones': milestones,
+        'milestone_stats': milestone_stats,
+        'visible_ideas': visible_ideas,
+        'recent_activity': recent_activity,
         'is_founder': is_founder,
         'is_mentor': is_mentor,
         'is_admin': is_admin,
@@ -150,6 +171,8 @@ def idea_create(request):
             if 'submit' in request.POST:
                 idea.status = 'submitted'
                 idea.submitted_at = timezone.now()
+                idea.save()
+                
                 Activity.objects.create(
                     startup=startup,
                     user=request.user,
@@ -169,9 +192,9 @@ def idea_create(request):
                 messages.success(request, "Your idea has been submitted successfully!")
             else:
                 idea.status = 'draft'
+                idea.save()
                 messages.success(request, "Your idea has been saved as a draft.")
                 
-            idea.save()
             return redirect('incubator:idea_list')
     else:
         form = IdeaForm()
@@ -706,7 +729,8 @@ def startup_directory(request):
 @login_required
 def startup_public_profile(request, startup_id):
     startup = get_object_or_404(Startup, id=startup_id)
-    return render(request, 'incubator/startup_public_profile.html', {'startup': startup})
+    jobs = startup.job_postings.filter(status='published').order_by('-created_at')
+    return render(request, 'incubator/startup_public_profile.html', {'startup': startup, 'jobs': jobs})
 
 @login_required
 def evaluation_list(request, startup_id):
@@ -1013,10 +1037,6 @@ def collaboration_request_create(request, recipient_id):
         
     requester_startup = get_active_startup(request.user)
     recipient_startup = get_active_startup(recipient)
-    
-    if requester_startup and recipient_startup and requester_startup == recipient_startup:
-        messages.error(request, "You cannot send a collaboration request to someone in your own startup.")
-        return redirect('incubator:collaboration_directory')
         
     # Check duplicate
     existing = CollaborationRequest.objects.filter(requester=request.user, recipient=recipient, status='pending').exists()
@@ -1059,11 +1079,47 @@ def collaboration_list(request):
     })
 
 @login_required
+def messages_list(request):
+    from django.db.models import Q
+    # Get all accepted collaborations for this user
+    active_collabs = CollaborationRequest.objects.filter(
+        Q(requester=request.user) | Q(recipient=request.user),
+        status='accepted'
+    ).order_by('-updated_at')
+    
+    return render(request, 'incubator/messages_list.html', {'active_collabs': active_collabs})
+
+@login_required
 def collaboration_detail(request, request_id):
     collab = get_object_or_404(CollaborationRequest, id=request_id)
     if request.user not in [collab.requester, collab.recipient] and request.user.role != 'admin':
         raise PermissionDenied
         
+    if request.method == 'POST' and collab.status == 'accepted':
+        content = request.POST.get('content', '').strip()
+        if content:
+            DirectMessage.objects.create(
+                collaboration=collab,
+                sender=request.user,
+                content=content
+            )
+            
+            # Send notification
+            recipient = collab.recipient if request.user == collab.requester else collab.requester
+            Notification.objects.create(
+                recipient=recipient,
+                actor=request.user,
+                title="New Direct Message",
+                message=f"{request.user.username} sent you a message.",
+                notification_type='direct_message',
+                link_url=reverse('incubator:collaboration_detail', args=[collab.id])
+            )
+            
+            return redirect('incubator:collaboration_detail', request_id=collab.id)
+            
+    # Mark messages as read
+    collab.messages.exclude(sender=request.user).update(is_read=True)
+    
     return render(request, 'incubator/collaboration_detail.html', {'collab': collab})
 
 @login_required
@@ -1333,10 +1389,15 @@ def funding_application_detail(request, app_id):
     
     if request.method == 'POST' and is_owner:
         new_status = request.POST.get('status')
-        if new_status in dict(FundingApplication.STATUS_CHOICES).keys():
+        old_status = app.status
+        if new_status in dict(FundingApplication.STATUS_CHOICES).keys() and new_status != old_status:
             app.status = new_status
             app.responded_at = timezone.now()
             app.save()
+            
+            total_raised = app.funding_round.applications.filter(status='accepted').aggregate(t=Sum('requested_amount'))['t'] or 0
+            app.funding_round.raised_amount = total_raised
+            app.funding_round.save()
             
             # Record activity and notify
             Activity.objects.create(startup=app.funding_round.startup, user=request.user, activity_type='funding_application_status_changed', description=f"Application status changed to {new_status}.")
@@ -1366,9 +1427,17 @@ def funding_application_withdraw(request, app_id):
     if request.user != app.investor:
         raise PermissionDenied
     if request.method == 'POST':
-        app.status = 'withdrawn'
-        app.save()
-        messages.success(request, "Application withdrawn.")
+        old_status = app.status
+        if old_status != 'withdrawn':
+            app.status = 'withdrawn'
+            app.save()
+            
+            if old_status == 'accepted':
+                total_raised = app.funding_round.applications.filter(status='accepted').aggregate(t=Sum('requested_amount'))['t'] or 0
+                app.funding_round.raised_amount = total_raised
+                app.funding_round.save()
+                
+            messages.success(request, "Application withdrawn.")
     return redirect('incubator:funding_application_detail', app_id=app.id)
 
 
@@ -1612,6 +1681,14 @@ def job_application_detail(request, app_id):
                 Activity.objects.create(startup=app.job.startup, user=request.user, activity_type='job_application_shortlisted', description=f"Application shortlisted.")
             elif new_status == 'rejected':
                 Activity.objects.create(startup=app.job.startup, user=request.user, activity_type='job_application_rejected', description=f"Application rejected.")
+            elif new_status == 'hired':
+                from .models import TeamMember
+                TeamMember.objects.get_or_create(
+                    startup=app.job.startup,
+                    user=app.applicant,
+                    defaults={'role': app.job.title, 'status': 'active'}
+                )
+                Activity.objects.create(startup=app.job.startup, user=request.user, activity_type='team_member_added', description=f"Hired {app.applicant.username} as {app.job.title}.")
 
             Notification.objects.create(
                 recipient=app.applicant,
@@ -1659,3 +1736,47 @@ def interview_create(request, app_id):
     else:
         form = InterviewForm()
     return render(request, 'incubator/interview_form.html', {'form': form, 'app': app})
+
+@login_required
+def team_chat(request, startup_id=None):
+    if startup_id:
+        startup = get_object_or_404(Startup, id=startup_id)
+    else:
+        startup = get_active_startup(request.user)
+        if not startup:
+            messages.info(request, "You must register a startup first.")
+            return redirect('incubator:register_startup')
+
+    if not (request.user == startup.founder or request.user.role == 'admin' or is_active_team_member(request.user, startup) or request.user == startup.mentor):
+        raise PermissionDenied
+
+    from .models import TeamMessage
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content:
+            TeamMessage.objects.create(startup=startup, sender=request.user, content=content)
+            
+            # Send notifications to other team members
+            team_users = [tm.user for tm in startup.team_members.all() if tm.user != request.user]
+            if startup.founder != request.user:
+                team_users.append(startup.founder)
+            
+            for user in team_users:
+                if user:
+                    Notification.objects.create(
+                        recipient=user,
+                        actor=request.user,
+                        startup=startup,
+                        title="New Team Message",
+                        message=f"{request.user.username} sent a message in team chat.",
+                        notification_type='team_message',
+                        link_url=reverse('incubator:team_chat_id', args=[startup.id])
+                    )
+
+            if startup_id:
+                return redirect('incubator:team_chat_id', startup_id=startup_id)
+            return redirect('incubator:team_chat')
+
+    messages_qs = TeamMessage.objects.filter(startup=startup)
+    return render(request, 'incubator/team_chat.html', {'startup': startup, 'messages_qs': messages_qs})
+

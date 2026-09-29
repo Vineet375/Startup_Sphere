@@ -13,4 +13,6 @@ urlpatterns = [
     path('admin-events/', views.admin_events, name='admin_events'),
     path('admin-collaborations/', views.admin_collaborations, name='admin_collaborations'),
     path('admin-activities/', views.admin_activities, name='admin_activities'),
+    path('search/', views.global_search, name='global_search'),
+    path('settings/', views.settings_view, name='settings'),
 ]

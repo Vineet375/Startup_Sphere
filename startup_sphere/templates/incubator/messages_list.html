@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Messages | StartupSphere{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-body" style="overflow-y: auto;">
+        <h4 class="fw-bold mb-4">Messages</h4>
+        
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card p-0 border-0 shadow-sm">
+                    <div class="list-group list-group-flush">
+                        {% for collab in active_collabs %}
+                            <a href="{% url 'incubator:collaboration_detail' collab.id %}#chat" class="list-group-item list-group-item-action p-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                                            <i class="bi bi-person-fill fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">
+                                                {% if request.user == collab.requester %}
+                                                    {{ collab.recipient.username }}
+                                                {% else %}
+                                                    {{ collab.requester.username }}
+                                                {% endif %}
+                                            </h6>
+                                            <p class="mb-0 small text-muted">{{ collab.title }}</p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        {% with unread=collab.messages.all|length %}
+                                            {% if unread > 0 %}
+                                                <span class="badge bg-primary rounded-pill">{{ unread }} Messages</span>
+                                            {% endif %}
+                                        {% endwith %}
+                                        <i class="bi bi-chevron-right ms-2 text-muted"></i>
+                                    </div>
+                                </div>
+                            </a>
+                        {% empty %}
+                            <div class="p-5 text-center text-muted">
+                                <i class="bi bi-chat-square-text display-4 mb-3 d-block opacity-50"></i>
+                                <h5>No active conversations</h5>
+                                <p>You haven't accepted any collaboration requests yet.</p>
+                                <a href="{% url 'incubator:collaboration_directory' %}" class="btn btn-outline-primary mt-2">Find Collaborators</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+{% endblock %}

@@ -55,7 +55,7 @@
                     <form action="{% url 'incubator:startup_update_status' startup.id %}" method="post" class="mt-2">
                         {% csrf_token %}
                         <div class="input-group input-group-sm">
-                            <select name="incubation_status" class="form-select bg-light text-muted border-0">
+                            <select name="incubation_status" class="form-select bg-body text-muted border-0">
                                 <option value="idea_stage" {% if startup.incubation_status == 'idea_stage' %}selected{% endif %}>Idea Stage</option>
                                 <option value="under_review" {% if startup.incubation_status == 'under_review' %}selected{% endif %}>Under Review</option>
                                 <option value="incubating" {% if startup.incubation_status == 'incubating' %}selected{% endif %}>Incubating</option>
@@ -98,25 +98,25 @@
                     {% if milestones %}
                         <div class="row g-2 mb-4 text-center small">
                             <div class="col">
-                                <div class="bg-light p-2 rounded">
+                                <div class="bg-body p-2 rounded">
                                     <div class="fw-bold fs-5">{{ milestone_stats.total }}</div>
                                     <div class="text-muted" style="font-size: 0.75rem;">Total</div>
                                 </div>
                             </div>
                             <div class="col">
-                                <div class="bg-light p-2 rounded">
-                                    <div class="fw-bold fs-5 text-secondary">{{ milestone_stats.pending }}</div>
+                                <div class="bg-body p-2 rounded">
+                                    <div class="fw-bold fs-5 text-muted">{{ milestone_stats.pending }}</div>
                                     <div class="text-muted" style="font-size: 0.75rem;">Pending</div>
                                 </div>
                             </div>
                             <div class="col">
-                                <div class="bg-light p-2 rounded">
+                                <div class="bg-body p-2 rounded">
                                     <div class="fw-bold fs-5 text-primary">{{ milestone_stats.in_progress }}</div>
                                     <div class="text-muted" style="font-size: 0.75rem;">In Progress</div>
                                 </div>
                             </div>
                             <div class="col">
-                                <div class="bg-light p-2 rounded">
+                                <div class="bg-body p-2 rounded">
                                     <div class="fw-bold fs-5 text-success">{{ milestone_stats.completed }}</div>
                                     <div class="text-muted" style="font-size: 0.75rem;">Completed</div>
                                 </div>
@@ -199,7 +199,7 @@
                             {% endfor %}
                         </div>
                         {% if visible_ideas|length > 3 %}
-                            <div class="card-footer bg-white text-center border-top-0 pt-0">
+                            <div class="card-footer bg-body text-center border-top-0 pt-0">
                                 {% if request.user == startup.founder %}
                                     <a href="{% url 'incubator:idea_list' %}" class="text-primary text-decoration-none small fw-medium">View All Ideas</a>
                                 {% else %}
@@ -232,7 +232,7 @@
                                     {% if 'review' in activity.activity_type or 'feedback' in activity.activity_type %}bg-warning
                                     {% elif 'completed' in activity.activity_type or 'approved' in activity.activity_type %}bg-success
                                     {% else %}bg-primary{% endif %} border border-light border-2 rounded-circle"></span>
-                                <p class="mb-1 fw-medium text-dark">{{ activity.description }}</p>
+                                <p class="mb-1 fw-medium text-body">{{ activity.description }}</p>
                                 <p class="text-muted small mb-0">{{ activity.created_at|date:"F j, Y - g:i a" }}</p>
                             </div>
                         {% endfor %}

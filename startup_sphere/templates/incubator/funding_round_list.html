@@ -3,7 +3,7 @@
 {% block layout %}
 <div class="d-flex" style="min-height: calc(100vh - 65px);">
     {% include 'dashboard/_sidebar.html' %}
-    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+    <main class="flex-grow-1 p-4 bg-body" style="overflow-y: auto;">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h4 class="fw-bold mb-0">{% if is_founder %}My Funding Rounds{% else %}Funding Opportunities{% endif %}</h4>
             {% if is_founder %}
@@ -19,7 +19,7 @@
                         <span class="badge bg-primary">{{ r.get_round_type_display }}</span>
                         {% if r.status == 'open' %}<span class="badge bg-success bg-opacity-10 text-success">Open</span>
                         {% elif r.status == 'closed' %}<span class="badge bg-danger bg-opacity-10 text-danger">Closed</span>
-                        {% else %}<span class="badge bg-secondary bg-opacity-10 text-secondary">{{ r.get_status_display }}</span>{% endif %}
+                        {% else %}<span class="badge bg-secondary bg-opacity-10 text-muted">{{ r.get_status_display }}</span>{% endif %}
                     </div>
                     <h5 class="fw-bold mt-2 mb-1">{{ r.round_name }}</h5>
                     <p class="text-muted small mb-3">{{ r.startup.name }}</p>

@@ -40,7 +40,7 @@
                                     <td class="text-muted small">{{ idea.updated_at|date:"M d, Y" }}</td>
                                     <td>
                                         {% if idea.status == 'draft' %}
-                                            <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary">Draft</span>
+                                            <span class="badge bg-secondary bg-opacity-10 text-muted border border-secondary">Draft</span>
                                         {% elif idea.status == 'submitted' %}
                                             <span class="badge bg-primary bg-opacity-10 text-primary border border-primary">Submitted</span>
                                         {% elif idea.status == 'under_review' %}
@@ -57,7 +57,7 @@
                                                 <i class="bi bi-eye"></i>
                                             </a>
                                             {% if idea.status == 'draft' and request.user == startup.founder %}
-                                                <a href="{% url 'incubator:idea_edit' idea.id %}" class="btn btn-sm btn-light text-secondary" title="Edit Draft">
+                                                <a href="{% url 'incubator:idea_edit' idea.id %}" class="btn btn-sm btn-light text-muted" title="Edit Draft">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
                                                 <a href="{% url 'incubator:idea_submit' idea.id %}" class="btn btn-sm btn-light text-success" title="Submit Idea">

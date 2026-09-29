@@ -14,7 +14,7 @@
             {% endif %}
         </div>
         
-        <div class="card p-3 mb-4 border-0 shadow-sm bg-light">
+        <div class="card p-3 mb-4 border-0 shadow-sm bg-body">
             <form method="get" class="row g-2 align-items-center">
                 <div class="col-md-6">
                     <input type="text" name="q" class="form-control" placeholder="Search events..." value="{{ query }}">
@@ -45,7 +45,7 @@
                             {% elif event.status == 'cancelled' %}
                             <span class="badge bg-danger bg-opacity-10 text-danger">Cancelled</span>
                             {% else %}
-                            <span class="badge bg-secondary bg-opacity-10 text-secondary">{{ event.get_status_display }}</span>
+                            <span class="badge bg-secondary bg-opacity-10 text-muted">{{ event.get_status_display }}</span>
                             {% endif %}
                         </div>
                         <h5 class="fw-bold mb-2">{{ event.title }}</h5>
@@ -67,7 +67,7 @@
                         </div>
                         {% endif %}
                     </div>
-                    <div class="card-footer bg-white border-top d-flex justify-content-between align-items-center">
+                    <div class="card-footer bg-body border-top d-flex justify-content-between align-items-center">
                         {% if event.id in registered_event_ids %}
                         <span class="badge bg-success"><i class="bi bi-check-circle me-1"></i> Registered</span>
                         {% else %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block title %}Team Chat | StartupSphere{% endblock %}
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    {% include 'dashboard/_sidebar.html' %}
+    <main class="flex-grow-1 p-4 bg-body" style="overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+            <div>
+                <h4 class="fw-bold mb-1">Team Chat - {{ startup.name }}</h4>
+                <p class="text-muted small mb-0">Collaborate with your team</p>
+            </div>
+            <a href="{% url 'incubator:team_list' %}" class="btn btn-outline-secondary btn-sm">Back to Team</a>
+        </div>
+
+        <div class="card border-0 shadow-sm d-flex flex-column" style="height: 60vh;">
+            <div class="card-body p-4 flex-grow-1 overflow-auto bg-body-tertiary" id="chat-box">
+                {% for msg in messages_qs %}
+                    <div class="d-flex flex-column mb-3 {% if msg.sender == request.user %}align-items-end{% else %}align-items-start{% endif %}">
+                        <small class="text-muted mb-1">{{ msg.sender.username }} &bull; {{ msg.timestamp|date:"M d, g:i a" }}</small>
+                        <div class="p-3 rounded {% if msg.sender == request.user %}bg-primary text-white{% else %}bg-white border{% endif %}" style="max-width: 75%;">
+                            {{ msg.content|linebreaksbr }}
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-center text-muted mt-5">
+                        <p>No messages yet. Say hello to your team!</p>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="card-footer bg-white border-top p-3">
+                <form method="post" class="d-flex gap-2">
+                    {% csrf_token %}
+                    <input type="text" name="content" class="form-control rounded-pill bg-body-tertiary border-0 px-4" placeholder="Type your message..." required autocomplete="off">
+                    <button type="submit" class="btn btn-primary rounded-circle" style="width: 45px; height: 45px;">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var chatBox = document.getElementById("chat-box");
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Settings | StartupSphere{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3">
+        {% include "dashboard/_sidebar.html" %}
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9">
+        <div class="card bg-body border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h4 class="mb-4">Account Settings</h4>
+                
+                <div class="mb-4 pb-4 border-bottom">
+                    <h5><i class="bi bi-person me-2"></i>Profile Information</h5>
+                    <p class="text-body mt-2 mb-1"><strong>Username:</strong> {{ user.username }}</p>
+                    <p class="text-body mb-1"><strong>Email:</strong> {{ user.email }}</p>
+                    <p class="text-body mb-3"><strong>Role:</strong> <span class="badge bg-primary">{{ user.get_role_display }}</span></p>
+                    <a href="{% url 'dashboard:profile' %}" class="btn btn-outline-primary btn-sm">Edit Profile</a>
+                </div>
+
+                <div class="mb-4 pb-4 border-bottom">
+                    <h5><i class="bi bi-palette me-2"></i>Appearance</h5>
+                    <p class="text-body mt-2">Toggle between Light and Dark mode using the <i class="bi bi-moon-fill mx-1"></i> icon in the top navigation bar. Your preference is automatically saved.</p>
+                </div>
+
+                <div class="mb-4">
+                    <h5><i class="bi bi-shield-lock me-2"></i>Security</h5>
+                    <p class="text-body mt-2">Manage your password and security settings.</p>
+                    
+                    <form method="post" class="mt-3" style="max-width: 400px;">
+                        {% csrf_token %}
+                        {{ password_form.non_field_errors }}
+                        {% for field in password_form %}
+                            <div class="mb-3">
+                                <label class="form-label fw-medium">{{ field.label }}</label>
+                                <input type="{{ field.field.widget.input_type }}" name="{{ field.html_name }}" class="form-control" {% if field.field.required %}required{% endif %}>
+                                {% if field.help_text %}
+                                    <div class="form-text text-muted small">{{ field.help_text|safe }}</div>
+                                {% endif %}
+                                {% for error in field.errors %}
+                                    <div class="text-danger small mt-1">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">Update Password</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

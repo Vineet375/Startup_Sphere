@@ -243,3 +243,102 @@ def admin_activities(request):
     activities = Activity.objects.all().order_by('-created_at')[:200]
     return render(request, 'dashboard/admin_activities.html', {'activities': activities})
 
+
+
+from django.db.models import Q
+
+@login_required
+def global_search(request):
+    from django.shortcuts import redirect
+    from django.urls import reverse
+    
+    query = request.GET.get("q", "").strip()
+    
+    # Smart Search Routes
+    q_lower = query.lower()
+    if q_lower == 'settings':
+        return redirect('dashboard:settings')
+    elif q_lower in ['dashboard', 'home']:
+        return redirect('dashboard:home')
+    elif q_lower == 'profile':
+        return redirect('dashboard:profile')
+    elif q_lower == 'logout':
+        return redirect('accounts:logout')
+    elif q_lower in ['job', 'jobs', 'career', 'careers']:
+        return redirect('incubator:job_directory')
+        
+    startups = []
+    users = []
+    events = []
+    jobs = []
+    
+    if query:
+        startups = Startup.objects.filter(
+            Q(name__icontains=query) | Q(tagline__icontains=query) | Q(category__icontains=query),
+            incubation_status__in=["active", "graduated"]
+        ).distinct()
+        
+        users = User.objects.filter(
+            Q(username__icontains=query) | Q(first_name__icontains=query) | Q(last_name__icontains=query)
+        ).exclude(id=request.user.id).distinct()
+        
+        now = timezone.now()
+        events = Event.objects.filter(
+            Q(title__icontains=query) | Q(description__icontains=query),
+            start_datetime__gte=now,
+            status="upcoming"
+        ).distinct()
+        
+        jobs = JobPosting.objects.filter(
+            Q(title__icontains=query) | Q(description__icontains=query),
+            status="published"
+        ).distinct()
+
+    return render(request, "dashboard/search_results.html", {
+        "query": query,
+        "startups": startups,
+        "users": users,
+        "events": events,
+        "jobs": jobs,
+    })
+
+
+from django.http import JsonResponse
+import json
+import random
+import requests
+import os
+from django.views.decorators.csrf import csrf_exempt
+
+@login_required
+def settings_view(request):
+    """
+    User settings view for managing profile, theme preferences, and account details.
+    """
+    from django.contrib.auth.forms import PasswordChangeForm
+    from django.contrib.auth import update_session_auth_hash
+    from django.contrib import messages
+    
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            # Updating the password logs out all other sessions for the user
+            # except the current one.
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('dashboard:settings')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+
+    context = {
+        'user': request.user,
+        'password_form': form
+    }
+    return render(request, 'dashboard/settings.html', context)
+
+
+
+

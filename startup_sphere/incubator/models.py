@@ -177,8 +177,7 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        ordering = ['-created_at']
+    ordering = ['-created_at']
 
     def __str__(self):
         return f"Notification for {self.recipient.username}: {self.title}"
@@ -262,8 +261,7 @@ class Evaluation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        constraints = [
+    constraints = [
             models.UniqueConstraint(fields=['startup', 'evaluator'], name='unique_evaluation')
         ]
 
@@ -314,8 +312,7 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        ordering = ['start_datetime']
+    ordering = ['start_datetime']
 
     def __str__(self):
         return f"{self.title} - {self.get_status_display()}"
@@ -334,8 +331,7 @@ class EventParticipation(models.Model):
     registered_at = models.DateTimeField(auto_now_add=True)
     attended_at = models.DateTimeField(null=True, blank=True)
 
-    class Meta:
-        constraints = [
+    constraints = [
             models.UniqueConstraint(fields=['event', 'participant'], name='unique_event_participation')
         ]
 
@@ -375,8 +371,7 @@ class CollaborationRequest(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     responded_at = models.DateTimeField(null=True, blank=True)
 
-    class Meta:
-        ordering = ['-created_at']
+    ordering = ['-created_at']
 
     def __str__(self):
         return f"From {self.requester.username} to {self.recipient.username} - {self.get_status_display()}"
@@ -467,10 +462,7 @@ class FundingApplication(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     responded_at = models.DateTimeField(null=True, blank=True)
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(fields=['funding_round', 'investor'], name='unique_funding_application')
-        ]
+    
 
     def __str__(self):
         return f"{self.investor.username} -> {self.funding_round.round_name}"
@@ -571,8 +563,7 @@ class JobApplication(models.Model):
     applied_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        constraints = [
+    constraints = [
             models.UniqueConstraint(fields=['job', 'applicant'], name='unique_job_application')
         ]
 
@@ -607,3 +598,24 @@ class Interview(models.Model):
 
     def __str__(self):
         return f"Interview: {self.application.applicant.username} - {self.application.job.title}"
+
+class DirectMessage(models.Model):
+    collaboration = models.ForeignKey(CollaborationRequest, on_delete=models.CASCADE, related_name='messages')
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    ordering = ['timestamp']
+
+    def __str__(self):
+        return f"Msg from {self.sender.username} at {self.timestamp}"
+
+
+class TeamMessage(models.Model):
+    startup = models.ForeignKey(Startup, on_delete=models.CASCADE, related_name='team_messages')
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    ordering = ['timestamp']

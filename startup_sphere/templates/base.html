@@ -253,12 +253,7 @@
             </button>
             
             <div class="collapse navbar-collapse" id="navbarNav">
-                {% if request.resolver_match.url_name != 'landing' %}
-                <form class="d-flex mx-auto ms-4 w-50 position-relative">
-                    <i class="bi bi-search position-absolute" style="left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
-                    <input class="form-control ps-5 rounded-pill bg-body border-0" type="search" placeholder="Search anything..." aria-label="Search">
-                </form>
-                {% endif %}
+                <div class="mx-auto w-50"></div>
 
                 <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item me-3">
@@ -266,6 +261,13 @@
                             <i class="bi bi-moon-fill" id="themeIcon"></i>
                         </button>
                     </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item me-3">
+                        <a class="nav-link" href="{% url 'dashboard:settings' %}" aria-label="Settings" style="padding: 8px; color: var(--text-muted);">
+                            <i class="bi bi-gear-fill fs-5"></i>
+                        </a>
+                    </li>
+                    {% endif %}
                     
                     {% if user.is_authenticated %}
                         <li class="nav-item me-3">
@@ -370,6 +372,8 @@
             setTheme(newTheme);
         });
     </script>
+    
+    
     
     {% block extra_js %}{% endblock %}
 </body>

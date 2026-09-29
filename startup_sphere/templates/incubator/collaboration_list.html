@@ -29,11 +29,16 @@
                                 {% if r.status == 'pending' %}<span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>
                                 {% elif r.status == 'accepted' %}<span class="badge bg-success bg-opacity-10 text-success">Accepted</span>
                                 {% elif r.status == 'rejected' %}<span class="badge bg-danger bg-opacity-10 text-danger">Rejected</span>
-                                {% else %}<span class="badge bg-secondary bg-opacity-10 text-secondary">Cancelled</span>{% endif %}
+                                {% else %}<span class="badge bg-secondary bg-opacity-10 text-muted">Cancelled</span>{% endif %}
                             </div>
                             <h6 class="fw-bold mb-1">{{ r.title }}</h6>
                             <p class="text-muted small mb-3">From: {{ r.requester.username }}</p>
-                            <a href="{% url 'incubator:collaboration_detail' r.id %}" class="btn btn-sm btn-outline-primary mt-auto">View Details</a>
+                            <div class="d-flex gap-2 mt-auto">
+                                <a href="{% url 'incubator:collaboration_detail' r.id %}" class="btn btn-sm btn-outline-primary flex-grow-1">View Details</a>
+                                {% if r.status == 'accepted' %}
+                                <a href="{% url 'incubator:collaboration_detail' r.id %}#chat" class="btn btn-sm btn-primary"><i class="bi bi-chat-dots me-1"></i>Chat</a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     {% empty %}
@@ -54,11 +59,16 @@
                                 {% if r.status == 'pending' %}<span class="badge bg-warning bg-opacity-10 text-warning">Pending</span>
                                 {% elif r.status == 'accepted' %}<span class="badge bg-success bg-opacity-10 text-success">Accepted</span>
                                 {% elif r.status == 'rejected' %}<span class="badge bg-danger bg-opacity-10 text-danger">Rejected</span>
-                                {% else %}<span class="badge bg-secondary bg-opacity-10 text-secondary">Cancelled</span>{% endif %}
+                                {% else %}<span class="badge bg-secondary bg-opacity-10 text-muted">Cancelled</span>{% endif %}
                             </div>
                             <h6 class="fw-bold mb-1">{{ r.title }}</h6>
                             <p class="text-muted small mb-3">To: {{ r.recipient.username }}</p>
-                            <a href="{% url 'incubator:collaboration_detail' r.id %}" class="btn btn-sm btn-outline-secondary mt-auto">View Details</a>
+                            <div class="d-flex gap-2 mt-auto">
+                                <a href="{% url 'incubator:collaboration_detail' r.id %}" class="btn btn-sm btn-outline-secondary flex-grow-1">View Details</a>
+                                {% if r.status == 'accepted' %}
+                                <a href="{% url 'incubator:collaboration_detail' r.id %}#chat" class="btn btn-sm btn-primary"><i class="bi bi-chat-dots me-1"></i>Chat</a>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     {% empty %}

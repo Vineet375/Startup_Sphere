@@ -3,7 +3,7 @@
 {% block layout %}
 <div class="d-flex" style="min-height: calc(100vh - 65px);">
     {% include 'dashboard/_sidebar.html' %}
-    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+    <main class="flex-grow-1 p-4 bg-body" style="overflow-y: auto;">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3 class="fw-bold m-0">Startup Directory</h3>
         </div>
@@ -53,7 +53,7 @@
                             {% if startup.logo %}
                                 <img src="{{ startup.logo.url }}" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
                             {% else %}
-                                <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                <div class="bg-secondary bg-opacity-10 text-muted rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
                                     <i class="bi bi-building fs-4"></i>
                                 </div>
                             {% endif %}
@@ -64,7 +64,7 @@
                         </div>
                         <p class="card-text text-muted">{{ startup.tagline|default:"No tagline provided." }}</p>
                     </div>
-                    <div class="card-footer bg-white border-0 pt-0 d-flex justify-content-between align-items-center">
+                    <div class="card-footer bg-body border-0 pt-0 d-flex justify-content-between align-items-center">
                         <span class="badge bg-primary rounded-pill">{{ startup.get_incubation_status_display }}</span>
                         <a href="{% url 'incubator:startup_public_profile' startup.id %}" class="btn btn-sm btn-outline-primary">View Profile</a>
                     </div>

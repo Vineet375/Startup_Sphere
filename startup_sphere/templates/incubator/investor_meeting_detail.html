@@ -3,7 +3,7 @@
 {% block layout %}
 <div class="d-flex" style="min-height: calc(100vh - 65px);">
     {% include 'dashboard/_sidebar.html' %}
-    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+    <main class="flex-grow-1 p-4 bg-body" style="overflow-y: auto;">
         <div class="mb-3">
             <a href="{% url 'incubator:funding_application_detail' meeting.funding_application.id %}" class="text-decoration-none text-muted">
                 <i class="bi bi-arrow-left me-1"></i> Back to Application

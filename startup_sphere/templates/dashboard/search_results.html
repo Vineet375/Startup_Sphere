@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results | StartupSphere{% endblock %}
+
+{% block layout %}
+<div class="d-flex" style="min-height: calc(100vh - 65px);">
+    <!-- Sidebar -->
+    {% include 'dashboard/_sidebar.html' %}
+
+    <!-- Main Content -->
+    <main class="flex-grow-1 p-4" style="overflow-y: auto;">
+        <div class="mb-4">
+            <h4 class="fw-bold mb-1">Search Results</h4>
+            {% if query %}
+                <p class="text-muted small">Showing results for "{{ query }}"</p>
+            {% else %}
+                <p class="text-muted small">Please enter a search query.</p>
+            {% endif %}
+        </div>
+
+        {% if query %}
+            <div class="row g-4">
+                <!-- Startups -->
+                <div class="col-12">
+                    <h5 class="fw-bold border-bottom pb-2 mb-3">Startups ({{ startups|length }})</h5>
+                    <div class="row g-3">
+                        {% for startup in startups %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title fw-bold mb-1"><a href="{% url 'incubator:startup_public_profile' startup.id %}" class="text-decoration-none">{{ startup.name }}</a></h6>
+                                    <p class="card-text text-muted small mb-2">{{ startup.tagline|truncatechars:60 }}</p>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary">{{ startup.get_category_display }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12"><p class="text-muted small">No startups found.</p></div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Users -->
+                <div class="col-12 mt-4">
+                    <h5 class="fw-bold border-bottom pb-2 mb-3">Users ({{ users|length }})</h5>
+                    <div class="row g-3">
+                        {% for u in users %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <div class="card-body d-flex align-items-center">
+                                    <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center fw-bold me-3" style="width: 40px; height: 40px;">
+                                        {{ u.username|make_list|first|upper }}
+                                    </div>
+                                    <div>
+                                        <h6 class="card-title fw-bold mb-0">
+                                            {% if u.role == 'investor' %}
+                                                <a href="{% url 'incubator:investor_profile_detail' u.id %}" class="text-decoration-none">{{ u.get_full_name|default:u.username }}</a>
+                                            {% else %}
+                                                {{ u.get_full_name|default:u.username }}
+                                            {% endif %}
+                                        </h6>
+                                        <p class="card-text text-muted small mb-0">{{ u.get_role_display }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12"><p class="text-muted small">No users found.</p></div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Events -->
+                <div class="col-12 mt-4">
+                    <h5 class="fw-bold border-bottom pb-2 mb-3">Events ({{ events|length }})</h5>
+                    <div class="row g-3">
+                        {% for event in events %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title fw-bold mb-1"><a href="{% url 'incubator:event_detail' event.id %}" class="text-decoration-none">{{ event.title }}</a></h6>
+                                    <p class="card-text text-muted small mb-2"><i class="bi bi-calendar me-1"></i> {{ event.start_datetime|date:"M d, Y H:i" }}</p>
+                                    <span class="badge bg-info bg-opacity-10 text-info">{{ event.get_event_type_display }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12"><p class="text-muted small">No upcoming events found.</p></div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Jobs -->
+                <div class="col-12 mt-4">
+                    <h5 class="fw-bold border-bottom pb-2 mb-3">Jobs ({{ jobs|length }})</h5>
+                    <div class="row g-3">
+                        {% for job in jobs %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="card h-100 shadow-sm border-0">
+                                <div class="card-body">
+                                    <h6 class="card-title fw-bold mb-1"><a href="{% url 'incubator:job_posting_detail' job.id %}" class="text-decoration-none">{{ job.title }}</a></h6>
+                                    <p class="card-text text-muted small mb-2">{{ job.startup.name }}</p>
+                                    <span class="badge bg-success bg-opacity-10 text-success">{{ job.get_employment_type_display }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12"><p class="text-muted small">No jobs found.</p></div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </main>
+</div>
+{% endblock layout %}

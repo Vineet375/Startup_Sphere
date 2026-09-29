@@ -34,6 +34,8 @@ urlpatterns = [
 
     # Team Management
     path('team/', views.team_list, name='team_list'),
+    path('team/chat/', views.team_chat, name='team_chat'),
+    path('startups/<int:startup_id>/team/chat/', views.team_chat, name='team_chat_id'),
     path('startups/<int:startup_id>/team/', views.team_list, name='team_list_id'),
     path('team/invite/', views.team_invite, name='team_invite'),
     path('team/<int:member_id>/edit/', views.team_member_edit, name='team_member_edit'),
@@ -70,6 +72,7 @@ urlpatterns = [
     path('collaboration/directory/', views.collaboration_directory, name='collaboration_directory'),
     path('collaboration/request/<int:recipient_id>/', views.collaboration_request_create, name='collaboration_request_create'),
     path('collaboration/requests/', views.collaboration_list, name='collaboration_list'),
+    path('messages/', views.messages_list, name='messages_list'),
     path('collaboration/requests/<int:request_id>/', views.collaboration_detail, name='collaboration_detail'),
     path('collaboration/requests/<int:request_id>/accept/', views.collaboration_accept, name='collaboration_accept'),
     path('collaboration/requests/<int:request_id>/reject/', views.collaboration_reject, name='collaboration_reject'),

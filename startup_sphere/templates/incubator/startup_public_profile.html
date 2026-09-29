@@ -3,7 +3,7 @@
 {% block layout %}
 <div class="d-flex" style="min-height: calc(100vh - 65px);">
     {% include 'dashboard/_sidebar.html' %}
-    <main class="flex-grow-1 p-4 bg-light" style="overflow-y: auto;">
+    <main class="flex-grow-1 p-4 bg-body" style="overflow-y: auto;">
         
         <div class="mb-3">
             <a href="{% url 'incubator:startup_directory' %}" class="text-decoration-none text-muted">
@@ -17,7 +17,7 @@
                     {% if startup.logo %}
                         <img src="{{ startup.logo.url }}" class="rounded-circle shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
                     {% else %}
-                        <div class="bg-secondary bg-opacity-10 text-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
+                        <div class="bg-secondary bg-opacity-10 text-muted rounded-circle d-flex align-items-center justify-content-center" style="width: 120px; height: 120px;">
                             <i class="bi bi-building" style="font-size: 3rem;"></i>
                         </div>
                     {% endif %}
@@ -26,7 +26,7 @@
                     <h2 class="fw-bold mb-1">{{ startup.name }}</h2>
                     <h5 class="text-muted mb-3">{{ startup.tagline|default:"" }}</h5>
                     <div class="d-flex flex-wrap gap-2 justify-content-center justify-content-md-start">
-                        <span class="badge bg-light text-dark border"><i class="bi bi-tag me-1"></i>{{ startup.get_category_display|default:"Uncategorized" }}</span>
+                        <span class="badge bg-body text-body border"><i class="bi bi-tag me-1"></i>{{ startup.get_category_display|default:"Uncategorized" }}</span>
                         <span class="badge bg-primary"><i class="bi bi-activity me-1"></i>{{ startup.get_incubation_status_display }}</span>
                     </div>
                 </div>
@@ -37,16 +37,31 @@
             <div class="row">
                 <div class="col-md-8">
                     <h5 class="fw-bold mb-3">About the Startup</h5>
-                    <p class="text-secondary" style="white-space: pre-line;">{{ startup.description|default:"No detailed description provided." }}</p>
+                    <p class="text-muted" style="white-space: pre-line;">{{ startup.description|default:"No detailed description provided." }}</p>
+                    
+                    {% if jobs %}
+                    <h5 class="fw-bold mb-3 mt-5">Open Roles</h5>
+                    <div class="list-group list-group-flush mb-4">
+                        {% for job in jobs %}
+                        <a href="{% url 'incubator:job_posting_detail' job.id %}" class="list-group-item list-group-item-action border rounded mb-2">
+                            <div class="d-flex w-100 justify-content-between align-items-center">
+                                <h6 class="mb-1 fw-bold">{{ job.title }}</h6>
+                                <small class="text-muted">{{ job.created_at|timesince }} ago</small>
+                            </div>
+                            <p class="mb-1 small text-muted">{{ job.get_employment_type_display }} • {{ job.get_experience_level_display }}</p>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
                 <div class="col-md-4">
-                    <div class="bg-light p-4 rounded text-center">
+                    <div class="bg-body p-4 rounded text-center">
                         <div class="mb-3">
-                            <div class="bg-white rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
+                            <div class="bg-body rounded-circle shadow-sm d-inline-flex align-items-center justify-content-center mb-2" style="width: 60px; height: 60px;">
                                 {% if startup.founder.avatar %}
                                     <img src="{{ startup.founder.avatar.url }}" class="rounded-circle w-100 h-100 object-fit-cover">
                                 {% else %}
-                                    <i class="bi bi-person fs-3 text-secondary"></i>
+                                    <i class="bi bi-person fs-3 text-muted"></i>
                                 {% endif %}
                             </div>
                             <h6 class="fw-bold m-0">{{ startup.founder.get_full_name|default:startup.founder.username }}</h6>
