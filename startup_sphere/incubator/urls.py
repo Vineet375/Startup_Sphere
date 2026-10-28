@@ -113,4 +113,7 @@ urlpatterns = [
     
     # Interviews
     path('applications/<int:app_id>/interview/', views.interview_create, name='interview_create'),
+    # REST API Interface
+    path('api/startups/', views.api_startups, name='api_startups'),
+    path('api/ideas/', views.api_ideas, name='api_ideas'),
 ]

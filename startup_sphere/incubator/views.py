@@ -1780,3 +1780,49 @@ def team_chat(request, startup_id=None):
     messages_qs = TeamMessage.objects.filter(startup=startup)
     return render(request, 'incubator/team_chat.html', {'startup': startup, 'messages_qs': messages_qs})
 
+
+
+from django.http import JsonResponse
+
+def api_startups(request):
+    """
+    REST API Interface for Startup Model.
+    Returns JSON serialized startup entities and progress metrics.
+    """
+    startups = Startup.objects.all()
+    data = []
+    for s in startups:
+        data.append({
+            'id': s.id,
+            'name': s.name,
+            'tagline': s.tagline,
+            'category': s.category,
+            'stage': s.stage,
+            'founder': s.founder.username if s.founder else None,
+            'mentor': s.mentor.username if s.mentor else None,
+            'created_at': s.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+            'total_ideas': s.ideas.count(),
+            'total_milestones': s.milestones.count(),
+            'total_team_members': s.team_members.count(),
+        })
+    return JsonResponse({'status': 'success', 'model': 'Startup', 'count': len(data), 'results': data}, safe=False)
+
+
+def api_ideas(request):
+    """
+    REST API Interface for Idea Model.
+    Returns JSON serialized idea records and review statuses.
+    """
+    ideas = Idea.objects.all()
+    data = []
+    for i in ideas:
+        data.append({
+            'id': i.id,
+            'title': i.title,
+            'startup': i.startup.name if i.startup else None,
+            'creator': i.creator.username if i.creator else None,
+            'status': i.status,
+            'industry': i.industry,
+            'created_at': i.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+        })
+    return JsonResponse({'status': 'success', 'model': 'Idea', 'count': len(data), 'results': data}, safe=False)
